@@ -22,6 +22,8 @@ infoForm.addEventListener('submit', async (e) => {
       body: JSON.stringify({ url: videoUrl }),
     });
 
+    if (!response.ok) throw new Error('Error al obtener información del video.');
+
     const data = await response.json();
 
     videoTitle.textContent = data.title;
@@ -30,39 +32,66 @@ infoForm.addEventListener('submit', async (e) => {
 
     data.formats.forEach((format) => {
       const option = document.createElement('option');
-      option.value = format.format_id;
-      option.textContent = `${format.quality} - ${format.filesize}`;
+      option.value = JSON.stringify(format); // Guardar toda la información del formato
+      option.textContent = `${format.quality} - ${format.filesize} ${format.requires_merge ? '(requiere conversión)' : ''}`;
       qualitySelect.appendChild(option);
     });
 
     videoPreview.classList.remove('hidden');
     statusMessage.textContent = '';
   } catch (error) {
-    statusMessage.textContent = 'Error al obtener información del video.';
+    statusMessage.textContent = error.message;
   }
 });
 
 downloadButton.addEventListener('click', async () => {
-  const selectedFormat = qualitySelect.value;
-  const type = document.querySelector('input[name="type"]:checked').value; // Video o audio
+  const selectedOption = qualitySelect.value;
 
-  statusMessage.textContent = `Descargando ${type}...`;
+  if (!selectedOption) {
+    statusMessage.textContent = 'Selecciona una calidad antes de descargar.';
+    return;
+  }
 
-  try {
-    const response = await fetch('/download', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: videoUrl, format_id: selectedFormat, type }),
-    });
+  const format = JSON.parse(selectedOption);
 
-    const blob = await response.blob();
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = type === 'audio' ? 'audio.mp3' : 'video.mp4';
-    link.click();
+  if (format.requires_merge) {
+    if (!confirm('Este formato requiere conversión y puede demorar más tiempo. ¿Deseas continuar?')) {
+      return;
+    }
 
-    statusMessage.textContent = '¡Descarga completada!';
-  } catch (error) {
-    statusMessage.textContent = 'Error al descargar el archivo.';
+    statusMessage.textContent = 'Iniciando conversión...';
+
+    try {
+      const response = await fetch('/convert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: videoUrl, format_id: format.format_id }),
+      });
+
+      if (!response.ok) throw new Error('Error durante la conversión.');
+
+      const blob = await response.blob();
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'video.mp4';
+      link.click();
+
+      statusMessage.textContent = '¡Conversión y descarga completadas!';
+    } catch (error) {
+      statusMessage.textContent = error.message;
+    }
+  } else {
+    statusMessage.textContent = 'Iniciando descarga rápida...';
+
+    try {
+      const link = document.createElement('a');
+      link.href = format.url;
+      link.download = 'video.mp4';
+      link.click();
+
+      statusMessage.textContent = '¡Descarga completada!';
+    } catch (error) {
+      statusMessage.textContent = 'Error al iniciar la descarga.';
+    }
   }
 });

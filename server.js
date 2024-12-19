@@ -24,13 +24,15 @@ app.post('/info', async (req, res) => {
   try {
     const info = await youtubedl(url, { dumpSingleJson: true });
 
-    // Filtrar calidades deseadas (360p, 720p, 1080p) y formatos MP4
     const desiredQualities = [360, 720, 1080];
     const formats = info.formats
       .filter((f) => f.ext === 'mp4' && desiredQualities.includes(f.height))
       .map((f) => ({
         quality: `${f.height}p`,
         format_id: f.format_id,
+        url: f.url || null, // Enlace directo si está disponible
+        has_audio: f.acodec !== 'none',
+        requires_merge: f.acodec === 'none', // Indica si requiere combinar audio
         filesize: f.filesize ? `${(f.filesize / (1024 * 1024)).toFixed(2)} MB` : 'Desconocido',
       }));
 
@@ -45,90 +47,56 @@ app.post('/info', async (req, res) => {
   }
 });
 
-// Endpoint para descargar video o audio
-app.post('/download', async (req, res) => {
-  const { url, format_id, type } = req.body;
+// Endpoint para convertir y combinar video/audio
+app.post('/convert', async (req, res) => {
+  const { url, format_id } = req.body;
 
-  if (!url || !format_id || !type) {
-    return res.status(400).json({ error: 'La URL, el formato y el tipo son requeridos.' });
+  if (!url || !format_id) {
+    return res.status(400).json({ error: 'La URL y el formato son requeridos.' });
   }
+
+  const tempFile = path.join(__dirname, 'downloads', `${Date.now()}.mp4`);
 
   try {
-    console.log(`Iniciando descarga: tipo=${type}, formato=${format_id}...`);
+    console.log(`Iniciando conversión: formato=${format_id}...`);
 
-    if (type === 'audio') {
-      // Descargar solo audio
-      const audioUrl = await youtubedl(url, {
-        format: 'bestaudio',
-        getUrl: true,
-      });
+    // Obtener URLs de video y audio
+    const videoUrl = await youtubedl(url, { format: format_id, getUrl: true });
+    const audioUrl = await youtubedl(url, { format: 'bestaudio', getUrl: true });
 
-      const tempFile = path.join(__dirname, 'downloads', `${Date.now()}_audio.mp3`);
-      const ffmpeg = spawn('ffmpeg', ['-i', audioUrl, '-q:a', '0', '-map', 'a', tempFile]);
-
-      ffmpeg.stderr.on('data', (data) => {
-        console.error(`Error en FFmpeg (audio): ${data.toString()}`);
-      });
-
-      ffmpeg.on('close', (code) => {
-        if (code === 0) {
-          res.download(tempFile, () => {
-            fs.unlinkSync(tempFile); // Eliminar archivo temporal después de enviarlo
-          });
-        } else {
-          console.error(`FFmpeg cerró con código (audio): ${code}`);
-          res.status(500).send('Error al procesar la descarga del audio.');
-        }
-      });
-    } else {
-      // Obtener URLs separadas de video y audio
-      const videoUrl = await youtubedl(url, {
-        format: format_id,
-        getUrl: true,
-      });
-      const audioUrl = await youtubedl(url, {
-        format: 'bestaudio',
-        getUrl: true,
-      });
-
-      const tempFile = path.join(__dirname, 'downloads', `${Date.now()}_video.mp4`);
-      const ffmpeg = spawn(
-        'ffmpeg',
-        [
-          '-i',
-          videoUrl,
-          '-i',
-          audioUrl,
-          '-c:v',
-          'copy',
-          '-c:a',
-          'aac',
-          '-strict',
-          'experimental',
-          tempFile,
-        ]
-      );
-
-      ffmpeg.stderr.on('data', (data) => {
-        console.error(`Error en FFmpeg (video): ${data.toString()}`);
-      });
-
-      ffmpeg.on('close', (code) => {
-        if (code === 0) {
-          res.download(tempFile, () => {
-            fs.unlinkSync(tempFile); // Eliminar archivo temporal después de enviarlo
-          });
-        } else {
-          console.error(`FFmpeg cerró con código (video): ${code}`);
-          res.status(500).send('Error al procesar la descarga del video.');
-        }
-      });
+    if (!videoUrl || !audioUrl) {
+      throw new Error('No se pudieron obtener los enlaces de video y audio.');
     }
+
+    // Ejecutar FFmpeg para combinar
+    const ffmpeg = spawn('ffmpeg', [
+      '-i', videoUrl,      // Entrada de video
+      '-i', audioUrl,      // Entrada de audio
+      '-c:v', 'copy',      // Copiar el video sin recodificar
+      '-c:a', 'aac',       // Convertir audio a AAC
+      '-strict', 'experimental',
+      '-shortest',         // Finalizar cuando el más corto (audio/video) termine
+      tempFile,
+    ]);
+
+    ffmpeg.stderr.on('data', (data) => {
+      console.error(`Error en FFmpeg (convertir): ${data}`);
+    });
+
+    ffmpeg.on('close', (code) => {
+      if (code === 0) {
+        res.download(tempFile, () => fs.unlinkSync(tempFile));
+      } else {
+        console.error(`FFmpeg cerró con código: ${code}`);
+        res.status(500).send('Error al procesar la conversión.');
+      }
+    });
   } catch (error) {
-    console.error('Error al procesar la descarga:', error);
-    res.status(500).json({ error: 'Error al descargar el archivo.' });
+    console.error('Error al convertir el archivo:', error);
+    res.status(500).json({ error: 'Error al convertir el archivo.' });
   }
 });
+
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
