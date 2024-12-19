@@ -1,0 +1,113 @@
+/* Estilos generales */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #141e30;
+  color: #fff;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.container {
+  max-width: 600px;
+  margin: 50px auto;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Títulos y textos */
+h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+p {
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+/* Formularios y botones */
+input[type="url"],
+select,
+button {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: none;
+  font-size: 1rem;
+}
+
+button {
+  background-color: #1f4068;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #162447;
+}
+
+/* Opciones de descarga */
+.download-options {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+}
+
+.download-options label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+}
+
+input[type="radio"] {
+  margin: 0;
+}
+
+/* Vista previa de video */
+iframe,
+img {
+  width: 100%;
+  height: 300px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+
+/* Estado oculto */
+.hidden {
+  display: none;
+}
+
+/* Mensajes de estado */
+#status {
+  font-size: 1rem;
+  color: #f1c40f;
+  margin-top: 20px;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .container {
+    margin: 20px auto;
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  button,
+  input[type="url"],
+  select {
+    font-size: 0.9rem;
+  }
+
+  .download-options label {
+    font-size: 0.9rem;
+  }
+}

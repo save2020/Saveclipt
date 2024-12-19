@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Descargar Videos de YouTube</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Descargar Videos de YouTube</h1>
+      <p>Ingresa la URL, previsualiza el video y elige la calidad que prefieras.</p>
+    </header>
+
+    <main>
+      <form id="infoForm">
+        <input type="url" id="videoUrl" placeholder="Ingresa la URL del video" required />
+        <button type="submit">Obtener Información</button>
+      </form>
+
+      <div id="videoPreview" class="hidden">
+        <h3 id="videoTitle"></h3>
+        <img id="videoThumbnail" alt="Vista previa" />
+        <iframe id="videoPlayer" src="" frameborder="0" allowfullscreen></iframe>
+
+        <label for="qualitySelect">Selecciona una calidad:</label>
+        <select id="qualitySelect"></select>
+
+        <div class="download-options">
+          <label>
+            <input type="radio" name="type" value="video" checked> Video (MP4)
+          </label>
+          <label>
+            <input type="radio" name="type" value="audio"> Solo Audio (MP3)
+          </label>
+        </div>
+
+        <button id="downloadButton">Descargar</button>
+      </div>
+      <p id="status"></p>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
