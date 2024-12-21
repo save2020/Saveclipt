@@ -9,6 +9,7 @@ const statusMessage = document.getElementById('status');
 
 let videoUrl = '';
 
+// Manejo del evento para obtener información del video
 infoForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   videoUrl = videoUrlInput.value;
@@ -16,7 +17,8 @@ infoForm.addEventListener('submit', async (e) => {
   statusMessage.textContent = 'Obteniendo información del video...';
 
   try {
-    const response = await fetch('/info', {
+    // Realiza una solicitud al endpoint /api/info
+    const response = await fetch('/api/info', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url: videoUrl }),
@@ -30,10 +32,22 @@ infoForm.addEventListener('submit', async (e) => {
     videoThumbnail.src = data.thumbnail;
     qualitySelect.innerHTML = '';
 
+    const uniqueFormats = [];
+    const seenQualities = new Set();
     data.formats.forEach((format) => {
+      const uniqueKey = `${format.quality}-${format.requires_merge}`;
+      if (!seenQualities.has(uniqueKey)) {
+        seenQualities.add(uniqueKey);
+        uniqueFormats.push(format);
+      }
+    });
+
+    uniqueFormats.forEach((format) => {
       const option = document.createElement('option');
-      option.value = JSON.stringify(format); // Guardar toda la información del formato
-      option.textContent = `${format.quality} - ${format.filesize} ${format.requires_merge ? '(requiere conversión)' : ''}`;
+      option.value = JSON.stringify(format);
+      option.textContent = `${format.quality} - ${format.filesize} ${
+        format.requires_merge ? '(requiere conversión)' : '(no requiere conversión)'
+      }`;
       qualitySelect.appendChild(option);
     });
 
@@ -44,8 +58,10 @@ infoForm.addEventListener('submit', async (e) => {
   }
 });
 
+// Manejo del evento para descargar el archivo seleccionado
 downloadButton.addEventListener('click', async () => {
   const selectedOption = qualitySelect.value;
+  const type = document.querySelector('input[name="type"]:checked').value;
 
   if (!selectedOption) {
     statusMessage.textContent = 'Selecciona una calidad antes de descargar.';
@@ -54,44 +70,72 @@ downloadButton.addEventListener('click', async () => {
 
   const format = JSON.parse(selectedOption);
 
-  if (format.requires_merge) {
-    if (!confirm('Este formato requiere conversión y puede demorar más tiempo. ¿Deseas continuar?')) {
-      return;
-    }
+  if (type === 'video') {
+    if (format.requires_merge) {
+      if (!confirm('Este formato requiere conversión y puede demorar más tiempo. ¿Deseas continuar?')) {
+        return;
+      }
 
-    statusMessage.textContent = 'Iniciando conversión...';
+      statusMessage.textContent = 'Iniciando conversión...';
+
+      try {
+        // Realiza una solicitud al endpoint /api/convert
+        const response = await fetch('/api/video', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: videoUrl, format_id: format.format_id }),
+        });
+
+        if (!response.ok) throw new Error('Error durante la conversión.');
+
+        const blob = await response.blob();
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${videoTitle.textContent}.mp4`;
+        link.click();
+
+        statusMessage.textContent = '¡Conversión y descarga completadas!';
+      } catch (error) {
+        statusMessage.textContent = error.message;
+      }
+    } else {
+      statusMessage.textContent = 'Iniciando descarga rápida...';
+
+      try {
+        const link = document.createElement('a');
+        link.href = format.url;
+        link.download = `${videoTitle.textContent}.mp4`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        statusMessage.textContent = '¡Descarga completada!';
+      } catch (error) {
+        statusMessage.textContent = 'Error al iniciar la descarga.';
+      }
+    }
+  } else if (type === 'audio') {
+    statusMessage.textContent = 'Iniciando extracción de audio...';
 
     try {
-      const response = await fetch('/convert', {
+      // Realiza una solicitud al endpoint /api/audio
+      const response = await fetch('/api/audio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: videoUrl, format_id: format.format_id }),
+        body: JSON.stringify({ url: videoUrl }),
       });
 
-      if (!response.ok) throw new Error('Error durante la conversión.');
+      if (!response.ok) throw new Error('Error durante la extracción de audio.');
 
       const blob = await response.blob();
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = 'video.mp4';
+      link.download = `${videoTitle.textContent || 'audio'}.mp3`;
       link.click();
 
-      statusMessage.textContent = '¡Conversión y descarga completadas!';
+      statusMessage.textContent = '¡Extracción y descarga de audio completadas!';
     } catch (error) {
       statusMessage.textContent = error.message;
-    }
-  } else {
-    statusMessage.textContent = 'Iniciando descarga rápida...';
-
-    try {
-      const link = document.createElement('a');
-      link.href = format.url;
-      link.download = 'video.mp4';
-      link.click();
-
-      statusMessage.textContent = '¡Descarga completada!';
-    } catch (error) {
-      statusMessage.textContent = 'Error al iniciar la descarga.';
     }
   }
 });
