@@ -17,7 +17,7 @@ infoForm.addEventListener('submit', async (e) => {
   statusMessage.textContent = 'Obteniendo información del video...';
 
   try {
-    // Realiza una solicitud al endpoint /api/info
+    // Solicitud al endpoint /api/info
     const response = await fetch('/api/info', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -32,27 +32,50 @@ infoForm.addEventListener('submit', async (e) => {
     videoThumbnail.src = data.thumbnail;
     qualitySelect.innerHTML = '';
 
-    const uniqueFormats = [];
-    const seenQualities = new Set();
-    data.formats.forEach((format) => {
-      const uniqueKey = `${format.quality}-${format.requires_merge}`;
-      if (!seenQualities.has(uniqueKey)) {
-        seenQualities.add(uniqueKey);
-        uniqueFormats.push(format);
-      }
-    });
+    // Mostrar mensaje de restricción si aplica
+    if (data.restriction) {
+      statusMessage.textContent = data.restriction;
+    } else {
+      statusMessage.textContent = '';
+    }
 
-    uniqueFormats.forEach((format) => {
-      const option = document.createElement('option');
-      option.value = JSON.stringify(format);
-      option.textContent = `${format.quality} - ${format.filesize} ${
-        format.requires_merge ? '(requiere conversión)' : '(no requiere conversión)'
-      }`;
-      qualitySelect.appendChild(option);
-    });
+    // Mostrar opciones de calidades según el grupo
+    if (Array.isArray(data.formats)) {
+      // Videos mayores a 50 minutos (solo no_merge)
+      data.formats.forEach((format) => {
+        const option = document.createElement('option');
+        option.value = JSON.stringify(format);
+        option.textContent = `${format.quality} - ${format.filesize} (sin conversión)`;
+        qualitySelect.appendChild(option);
+      });
+    } else {
+      // Videos menores a 50 minutos (dos grupos)
+      if (data.formats.no_merge) {
+        const noMergeGroup = document.createElement('optgroup');
+        noMergeGroup.label = 'Formatos que no requieren conversión';
+        data.formats.no_merge.forEach((format) => {
+          const option = document.createElement('option');
+          option.value = JSON.stringify(format);
+          option.textContent = `${format.quality} - ${format.filesize} (sin conversión)`;
+          noMergeGroup.appendChild(option);
+        });
+        qualitySelect.appendChild(noMergeGroup);
+      }
+
+      if (data.formats.requires_merge) {
+        const requiresMergeGroup = document.createElement('optgroup');
+        requiresMergeGroup.label = 'Formatos que requieren conversión';
+        data.formats.requires_merge.forEach((format) => {
+          const option = document.createElement('option');
+          option.value = JSON.stringify(format);
+          option.textContent = `${format.quality} - ${format.filesize} (requiere conversión)`;
+          requiresMergeGroup.appendChild(option);
+        });
+        qualitySelect.appendChild(requiresMergeGroup);
+      }
+    }
 
     videoPreview.classList.remove('hidden');
-    statusMessage.textContent = '';
   } catch (error) {
     statusMessage.textContent = error.message;
   }
@@ -72,14 +95,9 @@ downloadButton.addEventListener('click', async () => {
 
   if (type === 'video') {
     if (format.requires_merge) {
-      if (!confirm('Este formato requiere conversión y puede demorar más tiempo. ¿Deseas continuar?')) {
-        return;
-      }
-
-      statusMessage.textContent = 'Iniciando conversión...';
-
+      // Solicitar conversión y descarga de video
+      statusMessage.textContent = 'Iniciando conversión de video...';
       try {
-        // Realiza una solicitud al endpoint /api/convert
         const response = await fetch('/api/video', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -94,13 +112,13 @@ downloadButton.addEventListener('click', async () => {
         link.download = `${videoTitle.textContent}.mp4`;
         link.click();
 
-        statusMessage.textContent = '¡Conversión y descarga completadas!';
+        statusMessage.textContent = '¡Descarga completada!';
       } catch (error) {
         statusMessage.textContent = error.message;
       }
     } else {
+      // Descarga directa sin conversión
       statusMessage.textContent = 'Iniciando descarga rápida...';
-
       try {
         const link = document.createElement('a');
         link.href = format.url;
@@ -115,10 +133,9 @@ downloadButton.addEventListener('click', async () => {
       }
     }
   } else if (type === 'audio') {
+    // Solicitar extracción de audio
     statusMessage.textContent = 'Iniciando extracción de audio...';
-
     try {
-      // Realiza una solicitud al endpoint /api/audio
       const response = await fetch('/api/audio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -133,7 +150,7 @@ downloadButton.addEventListener('click', async () => {
       link.download = `${videoTitle.textContent || 'audio'}.mp3`;
       link.click();
 
-      statusMessage.textContent = '¡Extracción y descarga de audio completadas!';
+      statusMessage.textContent = '¡Descarga completada!';
     } catch (error) {
       statusMessage.textContent = error.message;
     }
