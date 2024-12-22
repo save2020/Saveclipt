@@ -7,14 +7,31 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Descargar Videos de YouTube</h1>
-      <p>Ingresa la URL, previsualiza el video y elige la calidad que prefieras.</p>
-    </header>
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <h1>Descargar Videos</h1>
+      </div>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#caracteristicas">Características</a></li>
+          <li><a href="#como-descargar">Cómo Descargar</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
 
-    <main>
-      <form id="infoForm">
+  <section class="hero">
+    <div class="hero-content">
+      <h2>Descarga tus videos favoritos de YouTube</h2>
+      <p>Rápido, seguro y fácil de usar. Obtén videos y audio en la mejor calidad.</p>
+      <a href="#infoForm" class="hero-btn">Comenzar Ahora</a>
+    </div>
+  </section>
+
+  <div class="container">
+    <main id="infoForm">
+      <form>
         <input type="url" id="videoUrl" placeholder="Ingresa la URL del video" required />
         <button type="submit">Obtener Información</button>
       </form>
@@ -40,7 +57,38 @@
       </div>
       <p id="status"></p>
     </main>
+
+    <section id="caracteristicas">
+      <h2>Características Principales</h2>
+      <p>Nuestra herramienta gratuita para descargar videos de YouTube está diseñada para ser rápida, segura y fácil de usar.</p>
+      <ul>
+        <li>Descargas en alta calidad (MP4, MP3, y más formatos disponibles).</li>
+        <li>Compatible con todos los dispositivos: PC, Mac, Android y iOS.</li>
+        <li>Sin necesidad de registro, instalación ni software adicional.</li>
+        <li>Convierte videos de YouTube a MP3 en segundos.</li>
+        <li>Soporte para múltiples resoluciones: 720p, 1080p y 4K.</li>
+      </ul>
+    </section>
+    
+    <section id="como-descargar">
+      <h2>Cómo Descargar Videos de YouTube</h2>
+      <ol>
+        <li>Copie el enlace del video de YouTube que desea descargar.</li>
+        <li>Pegue la URL del video en el campo "Ingresar la URL" en nuestra herramienta.</li>
+        <li>Seleccione el formato y la calidad deseada (video MP4 o audio MP3).</li>
+        <li>Presione el botón "Descargar" y obtenga el archivo en unos segundos.</li>
+      </ol>
+      <p>Descargar videos de YouTube nunca ha sido tan fácil. Nuestra plataforma garantiza una experiencia sin interrupciones y descargas rápidas.</p>
+    </section>
+    
   </div>
+
+  <footer>
+    <div class="footer-container">
+      <p>&copy; 2024 Descargar Videos de YouTube. Todos los derechos reservados.</p>
+      <p><a href="#">Política de Privacidad</a> | <a href="#">Términos de Uso</a></p>
+    </div>
+  </footer>
 
   <script src="script.js"></script>
 </body>

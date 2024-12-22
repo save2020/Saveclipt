@@ -1,4 +1,5 @@
-/* Estilos generales */
+
+/* General */
 body {
   font-family: Arial, sans-serif;
   background-color: #141e30;
@@ -8,86 +9,251 @@ body {
   text-align: center;
 }
 
-.container {
-  max-width: 600px;
-  margin: 50px auto;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+/* Header */
+header {
+  background-color: #1f4068;
+  padding: 15px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-/* Títulos y textos */
-h1 {
-  font-size: 2rem;
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+header .logo h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #fff;
+}
+
+header nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 15px;
+}
+
+header nav ul li a {
+  color: #00bcd4;
+  text-decoration: none;
+  font-size: 1.2rem; /* Tamaño aumentado */
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+header nav ul li a:hover {
+  color: #fff;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(to right, #141e30, #243b55);
+  color: #fff;
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.hero-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.hero h2 {
+  font-size: 2.5rem;
   margin-bottom: 10px;
 }
 
-p {
-  font-size: 1rem;
+.hero p {
+  font-size: 1.2rem;
   margin-bottom: 20px;
 }
 
-/* Formularios y botones */
-input[type="url"],
-select,
-button {
-  width: 100%;
+.hero-btn {
+  background-color: #00bcd4;
+  color: #fff;
+  padding: 10px 20px;
+  text-decoration: none;
+  font-size: 1.2rem;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.hero-btn:hover {
+  background-color: #0288d1;
+}
+
+/* Contenedor Principal */
+.container {
+  max-width: 700px; /* Aumentar el ancho máximo */
+  margin: 30px auto;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  color: #fff;
+}
+
+/* Formularios */
+form {
+  max-width: 700px; /* Aumentar el ancho máximo */
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+form input[type="url"], 
+form select, 
+form button {
+  font-size: 1.2rem; /* Tamaño de texto consistente */
   padding: 10px;
-  margin: 10px 0;
   border-radius: 5px;
   border: none;
-  font-size: 1rem;
+  outline: none;
 }
 
-button {
-  background-color: #1f4068;
+form button {
+  background-color: #00bcd4;
   color: #fff;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease;
 }
 
-button:hover {
-  background-color: #162447;
+form button:hover {
+  background-color: #0288d1;
 }
 
-/* Opciones de descarga */
+/* Vista previa de video */
+#videoPreview {
+  max-width: 700px; /* Aumentar el ancho máximo */
+  margin: 30px auto;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  color: #fff;
+}
+#videoPreview h3 {
+  font-size: 1.5rem; /* Títulos más grandes */
+  margin-bottom: 10px;
+}
+
+#videoPreview img,
+#videoPreview iframe {
+  width: 100%;
+  height: 300px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+#videoPreview .download-options {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+#videoPreview .download-options label {
+  font-size: 1.2rem; /* Texto consistente */
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+#qualitySelect {
+  width: 100%;
+  padding: 12px;
+  font-size: 1.2rem;
+  border: 1px solid #00bcd4;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  background-color: #1f4068;
+  color: #fff;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#qualitySelect:hover, #qualitySelect:focus {
+  border-color: #0288d1;
+  box-shadow: 0 0 5px rgba(0, 188, 212, 0.5);
+  outline: none;
+}
+
+/* Aumentar el tamaño del texto del label */
+label[for="qualitySelect"] {
+  font-size: 1.5rem; /* Tamaño más grande */
+  font-weight: bold; /* Texto en negrita */
+  margin-bottom: 10px; /* Espacio adicional debajo del label */
+  display: block; /* Asegura que el texto ocupe toda la línea */
+  color: #00bcd4; /* Color destacado */
+}
+
+
+/* Estilo para las opciones de descarga */
 .download-options {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 15px; /* Más espacio entre las opciones */
   margin: 20px 0;
 }
 
 .download-options label {
+  font-size: 1.2rem; /* Tamaño consistente */
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 1rem;
-}
-
-input[type="radio"] {
-  margin: 0;
-}
-
-/* Vista previa de video */
-iframe,
-img {
-  width: 100%;
-  height: 300px;
-  margin-bottom: 20px;
+  gap: 8px; /* Más espacio entre el radio y el texto */
+  cursor: pointer;
+  padding: 5px 10px; /* Espaciado interno */
+  background-color: #1f4068; /* Fondo oscuro */
   border-radius: 5px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.hidden {
-  display: none;
-  opacity: 0;
-  pointer-events: none;
+.download-options label:hover {
+  background-color: #0288d1; /* Fondo más claro al pasar */
+  transform: scale(1.05); /* Ligeramente más grande */
 }
 
-.hidden.active {
-  display: block;
-  opacity: 1;
-  transition: opacity 0.3s ease;
+.download-options input[type="radio"] {
+  accent-color: #00bcd4; /* Color personalizado para los radios */
+  transform: scale(1.2); /* Radios más grandes */
+}
+
+/* Estilo para el botón de descargar */
+#downloadButton {
+  background-color: #00bcd4; /* Fondo primario */
+  color: #fff; /* Texto blanco */
+  font-size: 1.3rem; /* Tamaño ligeramente mayor */
+  padding: 12px 25px; /* Más espacio para clics cómodos */
+  border: none;
+  border-radius: 8px; /* Bordes más redondeados */
+  cursor: pointer;
+  width: 100%; /* Botón ancho */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 188, 212, 0.2); /* Sombra para destacar */
+}
+
+#downloadButton:hover {
+  background-color: #0288d1; /* Fondo más claro al pasar */
+  transform: translateY(-2px); /* Ligeramente elevado */
+  box-shadow: 0 6px 12px rgba(0, 188, 212, 0.4); /* Sombra más intensa */
+}
+
+#downloadButton:active {
+  transform: translateY(0); /* Sin elevación al hacer clic */
+  box-shadow: 0 4px 8px rgba(0, 188, 212, 0.2); /* Sombra inicial */
+}
+
+
+#status {
+  font-size: 1.2rem;
+  margin-top: 10px;
 }
 
 #status.success {
@@ -98,24 +264,100 @@ img {
   color: #e74c3c;
 }
 
-/* Responsividad */
-@media (max-width: 768px) {
-  .container {
-    margin: 20px auto;
-    padding: 15px;
-  }
+/* Secciones */
+section {
+  max-width: 700px; /* Aumentar el ancho máximo */
+  margin: 30px auto;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  color: #fff;
+}
 
-  h1 {
-    font-size: 1.5rem;
-  }
+section h2 {
+  font-size: 2rem; /* Tamaño de títulos */
+  margin-bottom: 15px;
+  text-align: center;
+}
 
-  button,
-  input[type="url"],
-  select {
-    font-size: 0.9rem;
-  }
+section p {
+  font-size: 1.2rem; /* Tamaño de párrafos */
+  line-height: 1.8;
+  margin-bottom: 15px;
+}
 
-  .download-options label {
-    font-size: 0.9rem;
-  }
+section ul, section ol {
+  text-align: left;
+  padding-left: 20px;
+  font-size: 1.2rem; /* Tamaño de listas */
+  line-height: 1.8;
+}
+
+section ul li, section ol li {
+  margin-bottom: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.hidden.active {
+  display: block;
+  transition: opacity 0.3s ease;
+  opacity: 1;
+}
+/* Footer */
+footer {
+  background: linear-gradient(to right, #1f4068, #243b55); /* Gradiente que combina con el fondo */
+  color: #fff;
+  text-align: center;
+  padding: 15px 20px; /* Espaciado mayor para mejor diseño */
+  font-size: 1.2rem;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); /* Sombra superior */
+  border-top: 1px solid rgba(255, 255, 255, 0.2); /* Línea sutil en la parte superior */
+}
+
+footer a {
+  color: #00bcd4; /* Color consistente con los enlaces del sitio */
+  text-decoration: none;
+  margin: 0 10px; /* Más espacio entre enlaces */
+  font-weight: bold; /* Destacar los enlaces */
+  transition: color 0.3s, transform 0.2s; /* Suave transición */
+}
+
+footer a:hover {
+  color: #fff; /* Cambia a blanco al pasar el mouse */
+  transform: scale(1.1); /* Ligeramente más grande */
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px; /* Espaciado entre el contenido */
+}
+
+.footer-container p {
+  margin: 0;
+  font-size: 1.1rem; /* Ajuste de tamaño para consistencia */
+}
+
+.footer-container .social-icons {
+  display: flex;
+  gap: 15px; /* Espaciado entre iconos */
+  margin-top: 10px;
+}
+
+.footer-container .social-icons a {
+  color: #00bcd4;
+  font-size: 1.5rem; /* Tamaño destacado */
+  transition: color 0.3s, transform 0.3s;
+}
+
+.footer-container .social-icons a:hover {
+  color: #fff;
+  transform: scale(1.2); /* Efecto de ampliación */
 }
