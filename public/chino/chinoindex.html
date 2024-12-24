@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="../logo2.png" type="image/x-icon">
+  <title>SaveClip</title>
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <a href="chinoindex.html" class="logo-link">
+          <img src="../logo2.png" alt="SaveClip 标志" class="logo-img">
+          <h1 class="logo-title">SAVECLIP</h1>
+        </a>
+      </div>
+      
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#caracteristicas">功能特点</a></li>
+          <li><a href="#como-descargar">如何下载</a></li>
+          <li><a href="#limites">限制和建议</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content">
+      <h2>下载您喜爱的 YouTube 视频</h2>
+      <p>快速、安全、易于使用。以最佳质量获取视频和音频。</p>
+      <a href="#infoForm" class="hero-btn">立即开始</a>
+    </div>
+  </section>
+
+  <div class="container">
+    <main id="infoForm">
+      <form>
+        <input type="url" id="videoUrl" placeholder="输入视频 URL" required />
+        <button type="submit">搜索视频</button>
+      </form>
+
+      <div id="videoPreview" class="hidden">
+        <h3 id="videoTitle"></h3>
+        <img id="videoThumbnail" alt="预览" />
+        <iframe id="videoPlayer" src="" frameborder="0" allowfullscreen></iframe>
+      
+        <label for="qualitySelect">选择质量：</label>
+        <select id="qualitySelect"></select>
+      
+        <div class="download-options">
+          <label>
+            <input type="radio" name="type" value="video" checked> 视频 (MP4)
+          </label>
+          <label>
+            <input type="radio" name="type" value="audio"> 仅音频 (MP3)
+          </label>
+        </div>
+      
+        <button id="downloadButton">下载</button>
+        <button id="clearPreview" class="hidden">清除</button>
+      </div>
+      
+      <p id="status" class="status-message"></p>
+
+    </main>
+
+    <section id="caracteristicas">
+      <h2>主要特点</h2>
+      <p>我们的免费 YouTube 视频下载工具设计为快速、安全且易于使用。</p>
+      <ul>
+        <li>高质量下载 (MP4, MP3 及其他格式可用)。</li>
+        <li>兼容所有设备：PC、Mac、Android 和 iOS。</li>
+        <li>无需注册、安装或额外软件。</li>
+        <li>几秒钟内将 YouTube 视频转换为 MP3。</li>
+        <li>支持多种分辨率：720p、1080p 和 4K。</li>
+      </ul>
+    </section>
+
+    <section id="como-descargar">
+      <h2>如何下载 YouTube 视频</h2>
+      <ol>
+        <li>复制您想下载的 YouTube 视频链接。</li>
+        <li>将视频 URL 粘贴到我们的工具中的“输入视频 URL”字段中。</li>
+        <li>选择所需的格式和质量（MP4 视频或 MP3 音频）。</li>
+        <li>按“下载”按钮，在几秒钟内获取文件。</li>
+      </ol>
+      <p>下载 YouTube 视频从未如此简单。我们的平台确保无缝体验和快速下载。</p>
+    </section>
+
+    <section id="limites">
+      <h2>限制和建议</h2>
+      <p>目前，我们的工具有以下限制：</p>
+      <ul>
+        <li><strong>超过 50 分钟的视频：</strong>无法转换超过 50 分钟的视频。</li>
+        <li><strong>转换时间：</strong>预计每个视频的转换时间为 1-2 分钟。</li>
+        <li><strong>4-5 分钟的视频：</strong>我们的工具可以在几秒钟内下载这些视频，提供快速高效的体验。</li>
+      </ul>
+      <p>为了更顺畅的体验，我们建议下载不需要额外转换或较短的视频。</p>
+    </section>
+
+  </div>
+
+  <footer>
+    <div class="footer-container">
+      <p>&copy; 2024 SaveClip. 保留所有权利。</p>
+      <p><a href="chinopriva.html">隐私政策</a> | <a href="chinoter.html">使用条款</a></p>
+    </div>
+  </footer>
+
+  <script src="../script.js"></script>
+</body>
+</html>

@@ -1,5 +1,3 @@
-
-/* General */
 body {
   font-family: Arial, sans-serif;
   background-color: #141e30;
@@ -9,7 +7,6 @@ body {
   text-align: center;
 }
 
-/* Header */
 header {
   background-color: #1f4068;
   padding: 15px 20px;
@@ -33,6 +30,24 @@ header .logo h1 {
   color: #fff;
 }
 
+.logo-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  color: inherit;
+}
+
+.logo-img {
+  width: 40px;
+  height: 40px;
+}
+
+.logo-title {
+  font-size: 24px;
+  margin: 0;
+  color: white;
+}
+
 header nav ul {
   list-style: none;
   margin: 0;
@@ -44,7 +59,7 @@ header nav ul {
 header nav ul li a {
   color: #00bcd4;
   text-decoration: none;
-  font-size: 1.2rem; /* Tamaño aumentado */
+  font-size: 1.2rem;
   font-weight: 500;
   transition: color 0.3s;
 }
@@ -53,7 +68,6 @@ header nav ul li a:hover {
   color: #fff;
 }
 
-/* Hero Section */
 .hero {
   background: linear-gradient(to right, #141e30, #243b55);
   color: #fff;
@@ -90,9 +104,8 @@ header nav ul li a:hover {
   background-color: #0288d1;
 }
 
-/* Contenedor Principal */
 .container {
-  max-width: 700px; /* Aumentar el ancho máximo */
+  max-width: 700px;
   margin: 30px auto;
   padding: 20px;
   background: rgba(255, 255, 255, 0.1);
@@ -101,18 +114,16 @@ header nav ul li a:hover {
   color: #fff;
 }
 
-/* Formularios */
 form {
-  max-width: 700px; /* Aumentar el ancho máximo */
+  max-width: 700px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-form input[type="url"], 
-form select, 
-form button {
-  font-size: 1.2rem; /* Tamaño de texto consistente */
+
+form input[type="url"], form select, form button {
+  font-size: 1.2rem;
   padding: 10px;
   border-radius: 5px;
   border: none;
@@ -130,9 +141,8 @@ form button:hover {
   background-color: #0288d1;
 }
 
-/* Vista previa de video */
 #videoPreview {
-  max-width: 700px; /* Aumentar el ancho máximo */
+  max-width: 700px;
   margin: 30px auto;
   padding: 20px;
   background: rgba(255, 255, 255, 0.1);
@@ -140,8 +150,9 @@ form button:hover {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
   color: #fff;
 }
+
 #videoPreview h3 {
-  font-size: 1.5rem; /* Títulos más grandes */
+  font-size: 1.5rem;
   margin-bottom: 10px;
 }
 
@@ -160,19 +171,11 @@ form button:hover {
   margin: 20px 0;
 }
 
-#videoPreview .download-options label {
-  font-size: 1.2rem; /* Texto consistente */
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
 #qualitySelect {
   width: 100%;
   padding: 12px;
   font-size: 1.2rem;
-  border: 1px solid #00bcd4;
   border-radius: 8px;
-  margin-bottom: 20px;
   background-color: #1f4068;
   color: #fff;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -184,89 +187,56 @@ form button:hover {
   outline: none;
 }
 
-/* Aumentar el tamaño del texto del label */
-label[for="qualitySelect"] {
-  font-size: 1.5rem; /* Tamaño más grande */
-  font-weight: bold; /* Texto en negrita */
-  margin-bottom: 10px; /* Espacio adicional debajo del label */
-  display: block; /* Asegura que el texto ocupe toda la línea */
-  color: #00bcd4; /* Color destacado */
-}
-
-
-/* Estilo para las opciones de descarga */
 .download-options {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 15px; /* Más espacio entre las opciones */
+  gap: 15px;
   margin: 20px 0;
 }
 
 .download-options label {
-  font-size: 1.2rem; /* Tamaño consistente */
+  font-size: 1.2rem;
   display: flex;
   align-items: center;
-  gap: 8px; /* Más espacio entre el radio y el texto */
+  gap: 8px;
   cursor: pointer;
-  padding: 5px 10px; /* Espaciado interno */
-  background-color: #1f4068; /* Fondo oscuro */
+  padding: 5px 10px;
+  background-color: #1f4068;
   border-radius: 5px;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .download-options label:hover {
-  background-color: #0288d1; /* Fondo más claro al pasar */
-  transform: scale(1.05); /* Ligeramente más grande */
+  background-color: #0288d1;
+  transform: scale(1.05);
 }
 
 .download-options input[type="radio"] {
-  accent-color: #00bcd4; /* Color personalizado para los radios */
-  transform: scale(1.2); /* Radios más grandes */
+  accent-color: #00bcd4;
+  transform: scale(1.2);
 }
 
-/* Estilo para el botón de descargar */
 #downloadButton {
-  background-color: #00bcd4; /* Fondo primario */
-  color: #fff; /* Texto blanco */
-  font-size: 1.3rem; /* Tamaño ligeramente mayor */
-  padding: 12px 25px; /* Más espacio para clics cómodos */
-  border: none;
-  border-radius: 8px; /* Bordes más redondeados */
+  background-color: #00bcd4;
+  color: #fff;
+  font-size: 1.3rem;
+  padding: 12px 25px;
+  border-radius: 8px;
   cursor: pointer;
-  width: 100%; /* Botón ancho */
+  width: 100%;
   transition: background-color 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 4px 8px rgba(0, 188, 212, 0.2); /* Sombra para destacar */
 }
 
 #downloadButton:hover {
-  background-color: #0288d1; /* Fondo más claro al pasar */
-  transform: translateY(-2px); /* Ligeramente elevado */
-  box-shadow: 0 6px 12px rgba(0, 188, 212, 0.4); /* Sombra más intensa */
+  background-color: #0288d1;
+}
+.hidden {
+  display: none;
 }
 
-#downloadButton:active {
-  transform: translateY(0); /* Sin elevación al hacer clic */
-  box-shadow: 0 4px 8px rgba(0, 188, 212, 0.2); /* Sombra inicial */
-}
-
-
-#status {
-  font-size: 1.2rem;
-  margin-top: 10px;
-}
-
-#status.success {
-  color: #2ecc71;
-}
-
-#status.error {
-  color: #e74c3c;
-}
-
-/* Secciones */
 section {
-  max-width: 700px; /* Aumentar el ancho máximo */
+  max-width: 700px;
   margin: 30px auto;
   padding: 20px;
   background: rgba(255, 255, 255, 0.1);
@@ -276,13 +246,13 @@ section {
 }
 
 section h2 {
-  font-size: 2rem; /* Tamaño de títulos */
+  font-size: 2rem;
   margin-bottom: 15px;
   text-align: center;
 }
 
 section p {
-  font-size: 1.2rem; /* Tamaño de párrafos */
+  font-size: 1.2rem;
   line-height: 1.8;
   margin-bottom: 15px;
 }
@@ -290,74 +260,97 @@ section p {
 section ul, section ol {
   text-align: left;
   padding-left: 20px;
-  font-size: 1.2rem; /* Tamaño de listas */
+  font-size: 1.2rem;
   line-height: 1.8;
 }
 
-section ul li, section ol li {
-  margin-bottom: 10px;
-}
-
-.hidden {
-  display: none;
-}
-
-.hidden.active {
-  display: block;
-  transition: opacity 0.3s ease;
-  opacity: 1;
-}
-/* Footer */
 footer {
-  background: linear-gradient(to right, #1f4068, #243b55); /* Gradiente que combina con el fondo */
+  background: linear-gradient(to right, #1f4068, #243b55);
   color: #fff;
   text-align: center;
-  padding: 15px 20px; /* Espaciado mayor para mejor diseño */
+  padding: 15px 20px;
   font-size: 1.2rem;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); /* Sombra superior */
-  border-top: 1px solid rgba(255, 255, 255, 0.2); /* Línea sutil en la parte superior */
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 footer a {
-  color: #00bcd4; /* Color consistente con los enlaces del sitio */
+  color: #00bcd4;
   text-decoration: none;
-  margin: 0 10px; /* Más espacio entre enlaces */
-  font-weight: bold; /* Destacar los enlaces */
-  transition: color 0.3s, transform 0.2s; /* Suave transición */
+  margin: 0 10px;
+  font-weight: bold;
+  transition: color 0.3s, transform 0.2s;
 }
 
 footer a:hover {
-  color: #fff; /* Cambia a blanco al pasar el mouse */
-  transform: scale(1.1); /* Ligeramente más grande */
-}
-
-.footer-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px; /* Espaciado entre el contenido */
-}
-
-.footer-container p {
-  margin: 0;
-  font-size: 1.1rem; /* Ajuste de tamaño para consistencia */
-}
-
-.footer-container .social-icons {
-  display: flex;
-  gap: 15px; /* Espaciado entre iconos */
-  margin-top: 10px;
-}
-
-.footer-container .social-icons a {
-  color: #00bcd4;
-  font-size: 1.5rem; /* Tamaño destacado */
-  transition: color 0.3s, transform 0.3s;
-}
-
-.footer-container .social-icons a:hover {
   color: #fff;
-  transform: scale(1.2); /* Efecto de ampliación */
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  header nav ul {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .hero h2 {
+    font-size: 2rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+
+  form input[type="url"], form button {
+    font-size: 1rem;
+    padding: 8px;
+  }
+
+  .download-options {
+    flex-direction: column;
+  }
+
+  #videoPreview iframe {
+    height: 200px;
+  }
+}
+.status-message {
+  font-size: 1.5rem; 
+  font-weight: bold; 
+  color: #00bcd4;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.status-message.processing {
+  font-size: 2rem; 
+  color: #ff9800; 
+  animation: pulse 1.5s infinite; 
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+}
+label[for="qualitySelect"] {
+  font-size: 1.5rem; 
+  font-weight: bold; 
+  color: #ffffff; 
+  margin-bottom: 10px; 
+  display: block; 
 }

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="../logo2.png" type="image/x-icon">
+  <title>SaveClip</title>
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <a href="enindex.html" class="logo-link">
+          <img src="../logo2.png" alt="SaveClip Logo" class="logo-img">
+          <h1 class="logo-title">SAVECLIP</h1>
+        </a>
+      </div>
+      
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#caracteristicas">Features</a></li>
+          <li><a href="#como-descargar">How to Download</a></li>
+          <li><a href="#limites">Limits and Suggestions</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content">
+      <h2>Download Your Favorite YouTube Videos</h2>
+      <p>Fast, safe, and easy to use. Get videos and audio in the best quality.</p>
+      <a href="#infoForm" class="hero-btn">Start Now</a>
+    </div>
+  </section>
+
+  <div class="container">
+    <main id="infoForm">
+      <form>
+        <input type="url" id="videoUrl" placeholder="Enter the video URL" required />
+        <button type="submit">Search Video</button>
+      </form>
+
+      <div id="videoPreview" class="hidden">
+        <h3 id="videoTitle"></h3>
+        <img id="videoThumbnail" alt="Preview" />
+        <iframe id="videoPlayer" src="" frameborder="0" allowfullscreen></iframe>
+      
+        <label for="qualitySelect">Select a quality:</label>
+        <select id="qualitySelect"></select>
+      
+        <div class="download-options">
+          <label>
+            <input type="radio" name="type" value="video" checked> Video (MP4)
+          </label>
+          <label>
+            <input type="radio" name="type" value="audio"> Audio Only (MP3)
+          </label>
+        </div>
+      
+        <button id="downloadButton">Download</button>
+        <button id="clearPreview" class="hidden">Clear</button>
+      </div>
+      
+      <p id="status" class="status-message"></p>
+
+    </main>
+
+    <section id="caracteristicas">
+      <h2>Main Features</h2>
+      <p>Our free YouTube video downloader is designed to be fast, safe, and easy to use.</p>
+      <ul>
+        <li>High-quality downloads (MP4, MP3, and more formats available).</li>
+        <li>Compatible with all devices: PC, Mac, Android, and iOS.</li>
+        <li>No registration, installation, or additional software required.</li>
+        <li>Convert YouTube videos to MP3 in seconds.</li>
+        <li>Support for multiple resolutions: 720p, 1080p, and 4K.</li>
+      </ul>
+    </section>
+
+    <section id="como-descargar">
+      <h2>How to Download YouTube Videos</h2>
+      <ol>
+        <li>Copy the link of the YouTube video you want to download.</li>
+        <li>Paste the video URL into the "Enter the video URL" field in our tool.</li>
+        <li>Select the desired format and quality (MP4 video or MP3 audio).</li>
+        <li>Press the "Download" button and get the file in a few seconds.</li>
+      </ol>
+      <p>Downloading YouTube videos has never been easier. Our platform ensures a seamless experience and fast downloads.</p>
+    </section>
+
+    <section id="limites">
+      <h2>Limits and Suggestions</h2>
+      <p>Currently, our tool has the following limitations:</p>
+      <ul>
+        <li><strong>Videos longer than 50 minutes:</strong> It is not possible to convert videos longer than 50 minutes.</li>
+        <li><strong>Conversion time:</strong> The estimated conversion time is 1-2 minutes per video.</li>
+        <li><strong>Videos of 4-5 minutes:</strong> Our tool downloads these videos in seconds, providing a quick and efficient experience.</li>
+      </ul>
+      <p>For a smoother experience, we recommend downloading videos that do not require additional conversion or are shorter in length.</p>
+    </section>
+
+  </div>
+
+  <footer>
+    <div class="footer-container">
+      <p>&copy; 2024 SaveClip. All rights reserved.</p>
+      <p><a href="enprivacy-policy.html">Privacy Policy</a> | <a href="enterms-and-conditions.html">Terms of Use</a></p>
+    </div>
+  </footer>
+
+  <script src="../script.js"></script>
+</body>
+</html>

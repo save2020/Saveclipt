@@ -3,6 +3,14 @@ const youtubedl = require('youtube-dl-exec');
 
 const router = express.Router();
 
+// Variable global para rastrear el progreso
+let progress = 0;
+
+// Endpoint para rastrear el progreso de información
+router.get('/progress', (req, res) => {
+  res.json({ progress });
+});
+
 // Endpoint para obtener información del video
 router.post('/info', async (req, res) => {
   const { url } = req.body;
@@ -12,8 +20,20 @@ router.post('/info', async (req, res) => {
   }
 
   try {
+    progress = 0; // Inicializar progreso
+
+    // Simular progreso mediante intervalos mientras se procesa la información
+    const interval = setInterval(() => {
+      if (progress < 100) {
+        progress += 20; // Incrementar el progreso
+      }
+    }, 500);
+
     // Obtener información del video
     const info = await youtubedl(url, { dumpSingleJson: true });
+
+    clearInterval(interval); // Detener el incremento del progreso
+    progress = 100; // Marcar progreso como completo
 
     const desiredQualities = [360, 720, 1080];
     const formats = info.formats
@@ -74,12 +94,13 @@ router.post('/info', async (req, res) => {
       thumbnail: info.thumbnail,
       duration: durationInMinutes,
       formats: {
-        no_merge: groupNoMerge,       // Sin conversión, tiene audio y video
+        no_merge: groupNoMerge, // Sin conversión, tiene audio y video
         requires_merge: groupRequiresMerge, // Requiere conversión
       },
     });
   } catch (error) {
     console.error('Error al obtener información del video:', error.message);
+    progress = 0; // Reiniciar el progreso en caso de error
     res.status(500).json({ error: 'No se pudo obtener la información del video.' });
   }
 });
