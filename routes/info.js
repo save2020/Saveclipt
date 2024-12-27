@@ -30,7 +30,6 @@ router.get('/progress', (req, res) => {
     res.json({ progress });
 });
 
-// Endpoint para obtener información del video con rotación de proxies
 router.post('/info', async (req, res) => {
     const { url } = req.body;
 
@@ -76,7 +75,6 @@ router.post('/info', async (req, res) => {
                     filesize: f.filesize ? `${(f.filesize / (1024 * 1024)).toFixed(2)} MB` : 'Desconocido',
                 }));
 
-            // Separar formatos en dos grupos: los que requieren y los que no requieren conversión
             const groupNoMerge = [];
             const seenNoMerge = new Set();
 
@@ -87,17 +85,17 @@ router.post('/info', async (req, res) => {
                 }
             });
 
-            // Obtener duración del video
             const videoDuration = info.duration; // Duración en segundos
             const durationInMinutes = Math.floor(videoDuration / 60);
 
-            // Si el video dura más de 50 minutos, solo mostrar el grupo sin conversión
             if (durationInMinutes > 50) {
                 if (groupNoMerge.length === 0) {
+                    clearInterval(interval); // Asegurarse de detener el intervalo
                     return res.status(400).json({
                         error: 'No hay formatos disponibles con audio y video para este video.',
                     });
                 }
+                clearInterval(interval); // Detener el intervalo si hay un éxito
                 return res.json({
                     title: info.title,
                     thumbnail: info.thumbnail,
@@ -107,7 +105,6 @@ router.post('/info', async (req, res) => {
                 });
             }
 
-            // Para videos menores de 50 minutos, devolver ambos grupos
             const groupRequiresMerge = [];
             const seenRequiresMerge = new Set();
 
@@ -118,6 +115,8 @@ router.post('/info', async (req, res) => {
                 }
             });
 
+            // Enviar respuesta y detener el ciclo
+            clearInterval(interval); // Detener el intervalo si hay éxito
             return res.json({
                 title: info.title,
                 thumbnail: info.thumbnail,
@@ -137,5 +136,6 @@ router.post('/info', async (req, res) => {
     progress = 0;
     res.status(500).json({ error: 'No se pudo obtener la información del video después de varios intentos.' });
 });
+
 
 module.exports = router;
