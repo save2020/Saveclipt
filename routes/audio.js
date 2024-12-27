@@ -11,7 +11,15 @@ const proxies = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies.json
 // Función para seleccionar un proxy aleatorio
 function getRandomProxy() {
     const randomIndex = Math.floor(Math.random() * proxies.length);
-    return `${proxies[randomIndex].ip}:${proxies[randomIndex].port}`;
+    const proxy = proxies[randomIndex];
+
+    if (proxy.username && proxy.password) {
+        // Proxy con autenticación
+        return `${proxy.username}:${proxy.password}@${proxy.ip}:${proxy.port}`;
+    }
+
+    // Proxy sin autenticación
+    return `${proxy.ip}:${proxy.port}`;
 }
 
 router.post('/audio', async (req, res) => {
@@ -22,38 +30,51 @@ router.post('/audio', async (req, res) => {
     }
 
     const tempFile = path.join(__dirname, '../downloads', `${Date.now()}.mp3`);
+    const maxRetries = 10; // Número máximo de reintentos
+    let attempt = 0;
 
-    try {
-        console.log(`Iniciando extracción de audio desde: ${url}...`);
-
-        // Seleccionar un proxy aleatorio
+    while (attempt < maxRetries) {
         const proxy = getRandomProxy();
-        console.log(`Usando proxy: ${proxy}`);
+        console.log(`Usando proxy: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
 
-        await youtubedl(url, {
-            format: 'bestaudio',   // Descargar solo el audio
-            extractAudio: true,    // Extraer únicamente el audio
-            audioFormat: 'mp3',    // Convertir directamente a MP3
-            output: tempFile,      // Archivo de salida
-            proxy: `http://${proxy}` // Usar el proxy
-        });
+        try {
+            console.log(`Iniciando extracción de audio desde: ${url}...`);
 
-        console.log(`Audio descargado y convertido a MP3: ${tempFile}`);
+            // Descargar audio utilizando el proxy
+            await youtubedl(url, {
+                format: 'bestaudio',   // Descargar solo el audio
+                extractAudio: true,    // Extraer únicamente el audio
+                audioFormat: 'mp3',    // Convertir directamente a MP3
+                output: tempFile,      // Archivo de salida
+                proxy: `http://${proxy}` // Usar el proxy
+            });
 
-        res.download(tempFile, 'audio.mp3', (err) => {
-            if (err) {
-                console.error(`Error al enviar el archivo al cliente: ${err.message}`);
-            } else {
-                console.log('Archivo MP3 enviado al cliente correctamente.');
-            }
+            console.log(`Audio descargado y convertido a MP3: ${tempFile}`);
 
-            // Eliminar archivo temporal después de enviarlo
-            fs.unlinkSync(tempFile);
-        });
-    } catch (error) {
-        console.error('Error al extraer el audio:', error.message);
-        res.status(500).json({ error: 'Error al extraer el audio.' });
+            // Enviar el archivo al cliente
+            return res.download(tempFile, 'audio.mp3', (err) => {
+                if (err) {
+                    console.error(`Error al enviar el archivo al cliente: ${err.message}`);
+                } else {
+                    console.log('Archivo MP3 enviado al cliente correctamente.');
+                }
+
+                // Eliminar archivo temporal después de enviarlo
+                if (fs.existsSync(tempFile)) {
+                    fs.unlinkSync(tempFile);
+                }
+            });
+        } catch (error) {
+            console.error(`Error al usar el proxy ${proxy}: ${error.message}`);
+            attempt++; // Incrementar intentos en caso de fallo
+        }
     }
+
+    // Si todos los intentos fallan
+    if (fs.existsSync(tempFile)) {
+        fs.unlinkSync(tempFile); // Asegurarse de limpiar cualquier archivo temporal
+    }
+    res.status(500).json({ error: 'No se pudo extraer el audio después de varios intentos.' });
 });
 
 module.exports = router;
