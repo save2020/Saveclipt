@@ -30,6 +30,7 @@ router.get('/progress', (req, res) => {
     res.json({ progress });
 });
 
+// Endpoint para obtener información del video con rotación de proxies
 router.post('/info', async (req, res) => {
     const { url } = req.body;
 
@@ -136,6 +137,5 @@ router.post('/info', async (req, res) => {
     progress = 0;
     res.status(500).json({ error: 'No se pudo obtener la información del video después de varios intentos.' });
 });
-
 
 module.exports = router;
