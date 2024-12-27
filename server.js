@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
+const fs = require('fs');
 
 // Importar las rutas de la API
 const infoRoutes = require('./routes/info');
@@ -15,6 +16,13 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
+
+// Función para obtener un proxy aleatorio
+const proxies = JSON.parse(fs.readFileSync('proxies.json', 'utf-8'));
+function getRandomProxy() {
+    const randomIndex = Math.floor(Math.random() * proxies.length);
+    return `${proxies[randomIndex].ip}:${proxies[randomIndex].port}`;
+}
 
 // Rutas estáticas para los idiomas
 app.use('/en', express.static(path.join(__dirname, 'public/en')));
