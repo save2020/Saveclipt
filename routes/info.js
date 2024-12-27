@@ -38,7 +38,7 @@ router.post('/info', async (req, res) => {
         return res.status(400).json({ error: 'La URL es requerida.' });
     }
 
-    const maxRetries = 3; // Número máximo de reintentos
+    const maxRetries = 10; // Número máximo de reintentos
     let attempt = 0;
 
     while (attempt < maxRetries) {
