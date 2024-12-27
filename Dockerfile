@@ -1,5 +1,6 @@
 # Usa una imagen base de Node.js con soporte de Debian
-FROM node:16-bullseye
+FROM node:18-bullseye
+
 
 # Instala FFmpeg
 RUN apt-get update && apt-get install -y ffmpeg
