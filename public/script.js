@@ -9,6 +9,10 @@ const statusMessage = document.getElementById('status');
 
 let videoUrl = '';
 
+// Obtener la raíz del idioma desde la URL
+const langPath = window.location.pathname.split('/')[1]; // Detectar idioma (es, en, chino, etc.)
+const apiBaseUrl = `/${langPath}/api`; // Base URL dinámica para las rutas de la API
+
 // Configuración de traducciones
 const translations = {
   es: {
@@ -35,7 +39,6 @@ const translations = {
     noConversion: "no conversion",
     requiresConversion: "requires conversion"
   },
-
   zh: {
     fetchingInfo: "获取视频信息...",
     errorFetchingInfo: "获取视频信息时出错。",
@@ -47,78 +50,15 @@ const translations = {
     errorDuringDownload: "开始下载时出错。",
     noConversion: "无需转换",
     requiresConversion: "需要转换"
-  },
-  pt: {
-    fetchingInfo: "Obtendo informações do vídeo...",
-    errorFetchingInfo: "Erro ao obter informações do vídeo.",
-    selectQuality: "Selecione uma qualidade antes de baixar.",
-    startingVideoConversion: "Iniciando conversão de vídeo...",
-    startingQuickDownload: "Iniciando download rápido...",
-    startingAudioExtraction: "Iniciando extração de áudio...",
-    downloadCompleted: "Download concluído!",
-    errorDuringDownload: "Erro ao iniciar o download.",
-    noConversion: "sem conversão",
-    requiresConversion: "requer conversão"
-  },
-  fr: {
-    fetchingInfo: "Récupération des informations de la vidéo...",
-    errorFetchingInfo: "Erreur lors de la récupération des informations de la vidéo.",
-    selectQuality: "Sélectionnez une qualité avant de télécharger.",
-    startingVideoConversion: "Début de la conversion vidéo...",
-    startingQuickDownload: "Début du téléchargement rapide...",
-    startingAudioExtraction: "Début de l'extraction audio...",
-    downloadCompleted: "Téléchargement terminé !",
-    errorDuringDownload: "Erreur lors du démarrage du téléchargement.",
-    noConversion: "pas de conversion",
-    requiresConversion: "nécessite une conversion"
-  },
-  de: {
-    fetchingInfo: "Video-Informationen werden abgerufen...",
-    errorFetchingInfo: "Fehler beim Abrufen der Video-Informationen.",
-    selectQuality: "Wählen Sie eine Qualität vor dem Herunterladen.",
-    startingVideoConversion: "Video-Konvertierung starten...",
-    startingQuickDownload: "Schnell-Download starten...",
-    startingAudioExtraction: "Audio-Extraktion starten...",
-    downloadCompleted: "Download abgeschlossen!",
-    errorDuringDownload: "Fehler beim Starten des Downloads.",
-    noConversion: "keine Konvertierung",
-    requiresConversion: "erfordert Konvertierung"
-  },
-  ar: {
-    fetchingInfo: "جارٍ الحصول على معلومات الفيديو...",
-    errorFetchingInfo: "حدث خطأ أثناء الحصول على معلومات الفيديو.",
-    selectQuality: "اختر الجودة قبل التنزيل.",
-    startingVideoConversion: "بدء تحويل الفيديو...",
-    startingQuickDownload: "بدء التنزيل السريع...",
-    startingAudioExtraction: "بدء استخراج الصوت...",
-    downloadCompleted: "اكتمل التنزيل!",
-    errorDuringDownload: "حدث خطأ أثناء بدء التنزيل.",
-    noConversion: "بدون تحويل",
-    requiresConversion: "يتطلب تحويل"
-  },
-  hi: {
-    fetchingInfo: "वीडियो जानकारी प्राप्त की जा रही है...",
-    errorFetchingInfo: "वीडियो जानकारी प्राप्त करने में त्रुटि।",
-    selectQuality: "डाउनलोड करने से पहले गुणवत्ता चुनें।",
-    startingVideoConversion: "वीडियो रूपांतरण शुरू हो रहा है...",
-    startingQuickDownload: "त्वरित डाउनलोड शुरू हो रहा है...",
-    startingAudioExtraction: "ऑडियो निकालना शुरू हो रहा है...",
-    downloadCompleted: "डाउनलोड पूरा हुआ!",
-    errorDuringDownload: "डाउनलोड शुरू करने में त्रुटि।",
-    noConversion: "कोई रूपांतरण नहीं",
-    requiresConversion: "रूपांतरण की आवश्यकता है"
   }
 };
 
-// Determinar el idioma actual
-const userLang = navigator.language.slice(0, 2); // Extraer los primeros 2 caracteres del idioma
-
-// Función para obtener el mensaje traducido
+// Función para traducir mensajes
 function t(key) {
-  return translations[userLang]?.[key] || translations['en'][key] || key;
+  return translations[langPath]?.[key] || translations['en'][key] || key;
 }
 
-// Función para limpiar la vista previa y reiniciar el formulario
+// Función para limpiar el formulario
 function resetForm() {
   videoUrl = '';
   videoUrlInput.value = '';
@@ -127,16 +67,15 @@ function resetForm() {
   videoPreview.classList.add('hidden');
   qualitySelect.innerHTML = '';
   statusMessage.textContent = '';
-  statusMessage.classList.remove('processing'); // Asegura que se elimine la animación
+  statusMessage.classList.remove('processing'); // Eliminar animación
 }
 
-// Función para iniciar la animación del estado
+// Funciones para animar el estado
 function startProcessing(message) {
   statusMessage.textContent = message;
   statusMessage.classList.add('processing');
 }
 
-// Función para detener la animación del estado
 function stopProcessing(message) {
   statusMessage.textContent = message;
   statusMessage.classList.remove('processing');
@@ -147,10 +86,15 @@ infoForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   videoUrl = videoUrlInput.value;
 
+  if (!videoUrl) {
+    stopProcessing(t('errorFetchingInfo'));
+    return;
+  }
+
   startProcessing(t('fetchingInfo'));
 
   try {
-    const response = await fetch('/api/info', {
+    const response = await fetch(`${apiBaseUrl}/info`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url: videoUrl }),
@@ -170,6 +114,7 @@ infoForm.addEventListener('submit', async (e) => {
       stopProcessing('');
     }
 
+    // Manejo de formatos
     if (Array.isArray(data.formats)) {
       data.formats.forEach((format) => {
         const option = document.createElement('option');
@@ -178,6 +123,7 @@ infoForm.addEventListener('submit', async (e) => {
         qualitySelect.appendChild(option);
       });
     } else {
+      // Separar por tipo de conversión
       if (data.formats.no_merge) {
         const noMergeGroup = document.createElement('optgroup');
         noMergeGroup.label = t('noConversion');
@@ -225,7 +171,7 @@ downloadButton.addEventListener('click', async () => {
     if (format.requires_merge) {
       startProcessing(t('startingVideoConversion'));
       try {
-        const response = await fetch('/api/video', {
+        const response = await fetch(`${apiBaseUrl}/video`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url: videoUrl, format_id: format.format_id }),
@@ -263,7 +209,7 @@ downloadButton.addEventListener('click', async () => {
   } else if (type === 'audio') {
     startProcessing(t('startingAudioExtraction'));
     try {
-      const response = await fetch('/api/audio', {
+      const response = await fetch(`${apiBaseUrl}/audio`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: videoUrl }),
