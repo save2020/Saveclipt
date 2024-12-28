@@ -10,9 +10,12 @@ const router = express.Router();
 const proxies = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies.json'), 'utf-8'));
 
 // Función para seleccionar un proxy aleatorio
-function getRandomProxy() {
-    const randomIndex = Math.floor(Math.random() * proxies.length);
-    const proxy = proxies[randomIndex];
+function getRandomProxy(usedProxies = []) {
+    let proxy;
+    do {
+        const randomIndex = Math.floor(Math.random() * proxies.length);
+        proxy = proxies[randomIndex];
+    } while (usedProxies.includes(proxy) && usedProxies.length < proxies.length);
 
     if (proxy.username && proxy.password) {
         return `${proxy.username}:${proxy.password}@${proxy.ip}:${proxy.port}`;
@@ -32,8 +35,10 @@ function ensureDownloadsDir() {
 
 // Función para manejar la descarga con reintentos
 async function downloadWithRetries(url, options, retries = 10) {
+    const usedProxies = [];
     for (let i = 0; i < retries; i++) {
-        const proxy = getRandomProxy();
+        const proxy = getRandomProxy(usedProxies);
+        usedProxies.push(proxy);
         console.log(`Intento ${i + 1}/${retries} con proxy: ${proxy}`);
 
         try {
