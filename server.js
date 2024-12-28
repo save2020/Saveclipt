@@ -1,8 +1,8 @@
+// Importar módulos necesarios
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
-const fs = require('fs');
 
 // Importar las rutas de la API
 const infoRoutes = require('./routes/info');
@@ -17,19 +17,18 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-// Función para detectar el idioma del navegador o cliente
+// Redirección automática según el idioma
 app.use((req, res, next) => {
   const acceptLanguage = req.headers['accept-language'] || '';
-  const primaryLanguage = acceptLanguage.split(',')[0].split('-')[0]; // Detectar idioma principal
+  const primaryLanguage = acceptLanguage.split(',')[0].split('-')[0];
 
-  // Redirigir automáticamente a la ruta correspondiente si no se especifica un idioma
   if (!req.url.startsWith('/en') && !req.url.startsWith('/es') && !req.url.startsWith('/chino')) {
     switch (primaryLanguage) {
-      case 'en': // Inglés
+      case 'en':
         return res.redirect(`/en${req.url}`);
-      case 'es': // Español
+      case 'es':
         return res.redirect(`/es${req.url}`);
-      case 'zh': // Chino
+      case 'zh':
         return res.redirect(`/chino${req.url}`);
       default:
         return res.redirect(`/en${req.url}`); // Idioma predeterminado: inglés
@@ -81,10 +80,10 @@ app.get('/chino/chinoter', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/chino/chinoter.html'));
 });
 
-// Rutas de la API
-app.use('/api', infoRoutes); // Manejo de información del video
-app.use('/api', audioRoutes); // Manejo de audio
-app.use('/api', videoRoutes); // Manejo de videos
+// Rutas de la API dinámicas según idioma
+app.use('/:lang/api', infoRoutes); // Información del video
+app.use('/:lang/api', audioRoutes); // Manejo de audio
+app.use('/:lang/api', videoRoutes); // Manejo de videos
 
 // Iniciar el servidor
 app.listen(PORT, () => {
