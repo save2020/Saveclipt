@@ -26,14 +26,14 @@ function getRandomProxy() {
 const progressTracker = {};
 
 // Endpoint para rastrear el progreso de información
-router.get('/:lang/progress/:id', (req, res) => {
+router.get('/progress/:id', (req, res) => {
     const { id } = req.params;
     const progress = progressTracker[id] || 0;
     res.json({ progress });
 });
 
 // Endpoint para obtener información del video con rotación de proxies
-router.post('/:lang/info', async (req, res) => {
+router.post('/info', async (req, res) => {
     const { url } = req.body;
     const { lang } = req.params; // Capturar el idioma de la ruta
     const requestId = `${Date.now()}-${Math.random()}`; // Generar un ID único para esta solicitud
