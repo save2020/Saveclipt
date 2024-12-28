@@ -22,17 +22,22 @@ function getRandomProxy() {
     return `${proxy.ip}:${proxy.port}`;
 }
 
-// Variable global para rastrear el progreso
-let progress = 0;
+// Objeto para rastrear el progreso por solicitud
+const progressTracker = {};
 
 // Endpoint para rastrear el progreso de información
-router.get('/progress', (req, res) => {
+router.get('/:lang/progress/:id', (req, res) => {
+    const { id } = req.params;
+    const progress = progressTracker[id] || 0;
     res.json({ progress });
 });
 
 // Endpoint para obtener información del video con rotación de proxies
-router.post('/info', async (req, res) => {
+router.post('/:lang/info', async (req, res) => {
     const { url } = req.body;
+    const { lang } = req.params; // Capturar el idioma de la ruta
+    const requestId = `${Date.now()}-${Math.random()}`; // Generar un ID único para esta solicitud
+    progressTracker[requestId] = 0; // Inicializar progreso
 
     if (!url) {
         return res.status(400).json({ error: 'La URL es requerida.' });
@@ -46,12 +51,10 @@ router.post('/info', async (req, res) => {
         console.log(`Usando proxy: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
 
         try {
-            progress = 0; // Inicializar progreso
-
-            // Simular progreso mediante intervalos mientras se procesa la información
+            // Simular progreso mientras se procesa la información
             const interval = setInterval(() => {
-                if (progress < 100) {
-                    progress += 20; // Incrementar el progreso
+                if (progressTracker[requestId] < 100) {
+                    progressTracker[requestId] += 20; // Incrementar el progreso
                 }
             }, 500);
 
@@ -62,7 +65,7 @@ router.post('/info', async (req, res) => {
             });
 
             clearInterval(interval); // Detener el incremento del progreso
-            progress = 100; // Marcar progreso como completo
+            progressTracker[requestId] = 100; // Marcar progreso como completo
 
             const desiredQualities = [360, 720, 1080];
             const formats = info.formats
@@ -92,11 +95,13 @@ router.post('/info', async (req, res) => {
             if (durationInMinutes > 50) {
                 if (groupNoMerge.length === 0) {
                     clearInterval(interval); // Asegurarse de detener el intervalo
+                    delete progressTracker[requestId]; // Limpiar progreso
                     return res.status(400).json({
                         error: 'No hay formatos disponibles con audio y video para este video.',
                     });
                 }
                 clearInterval(interval); // Detener el intervalo si hay un éxito
+                delete progressTracker[requestId]; // Limpiar progreso
                 return res.json({
                     title: info.title,
                     thumbnail: info.thumbnail,
@@ -118,6 +123,7 @@ router.post('/info', async (req, res) => {
 
             // Enviar respuesta y detener el ciclo
             clearInterval(interval); // Detener el intervalo si hay éxito
+            delete progressTracker[requestId]; // Limpiar progreso
             return res.json({
                 title: info.title,
                 thumbnail: info.thumbnail,
@@ -134,7 +140,8 @@ router.post('/info', async (req, res) => {
     }
 
     // Si todos los intentos fallan
-    progress = 0;
+    progressTracker[requestId] = 0; // Reiniciar progreso en caso de error
+    delete progressTracker[requestId]; // Eliminar progreso
     res.status(500).json({ error: 'No se pudo obtener la información del video después de varios intentos.' });
 });
 

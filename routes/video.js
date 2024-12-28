@@ -24,7 +24,7 @@ function getRandomProxy() {
 }
 
 // Endpoint para manejar la conversión de videos
-router.post('/video', async (req, res) => {
+router.post('/:lang/video', async (req, res) => {
     const { url, format_id } = req.body;
 
     if (!url || !format_id) {
