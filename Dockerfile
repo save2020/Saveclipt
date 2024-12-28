@@ -19,9 +19,15 @@ RUN npm install
 # Copia todos los archivos del proyecto al contenedor
 COPY . .
 
+# Crea el directorio de descargas y establece permisos
+RUN mkdir -p /app/downloads && chmod -R 777 /app/downloads
+
 # Asegúrate de que los directorios de idiomas están en la carpeta `public`
 # Ejemplo: public/en, public/es, public/chino
 # Si ya están organizados en el proyecto local, no es necesario copiarlos manualmente
+
+# Establece la variable de entorno para evitar problemas con el host
+ENV NODE_ENV=production
 
 # Expone el puerto (Render usará esta configuración)
 EXPOSE 3000
