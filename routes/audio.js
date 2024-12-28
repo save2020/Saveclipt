@@ -14,8 +14,11 @@ function getRandomProxy() {
     const proxy = proxies[randomIndex];
 
     if (proxy.username && proxy.password) {
+        // Proxy con autenticación
         return `${proxy.username}:${proxy.password}@${proxy.ip}:${proxy.port}`;
     }
+
+    // Proxy sin autenticación
     return `${proxy.ip}:${proxy.port}`;
 }
 
@@ -23,13 +26,8 @@ function getRandomProxy() {
 function ensureDownloadsDir() {
     const downloadsDir = path.join(__dirname, '../downloads');
     if (!fs.existsSync(downloadsDir)) {
-        try {
-            fs.mkdirSync(downloadsDir, { recursive: true });
-            console.log(`Directorio creado: ${downloadsDir}`);
-        } catch (err) {
-            console.error(`Error al crear el directorio: ${err.message}`);
-            throw new Error('Error al crear el directorio de descargas');
-        }
+        fs.mkdirSync(downloadsDir, { recursive: true });
+        console.log(`Directorio creado: ${downloadsDir}`);
     }
     return downloadsDir;
 }
@@ -42,59 +40,54 @@ router.post('/audio', async (req, res) => {
         return res.status(400).json({ error: 'La URL es requerida.' });
     }
 
-    try {
-        // Asegurar que el directorio `downloads` exista
-        const downloadsDir = ensureDownloadsDir();
-        const tempFile = path.join(downloadsDir, `${Date.now()}.mp3`);
-        const maxRetries = 10; // Número máximo de reintentos
-        let attempt = 0;
+    // Asegurar que el directorio `downloads` exista
+    const downloadsDir = ensureDownloadsDir();
+    const tempFile = path.join(downloadsDir, `${Date.now()}.mp3`);
+    const maxRetries = 10; // Número máximo de reintentos
+    let attempt = 0;
 
-        while (attempt < maxRetries) {
-            const proxy = getRandomProxy();
-            console.log(`Usando proxy: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
+    while (attempt < maxRetries) {
+        const proxy = getRandomProxy();
+        console.log(`Usando proxy: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
 
-            try {
-                console.log(`Iniciando extracción de audio desde: ${url}...`);
+        try {
+            console.log(`Iniciando extracción de audio desde: ${url}...`);
 
-                // Descargar audio utilizando el proxy
-                await youtubedl(url, {
-                    format: 'bestaudio', // Descargar solo el audio
-                    extractAudio: true,  // Extraer únicamente el audio
-                    audioFormat: 'mp3',  // Convertir directamente a MP3
-                    output: tempFile,    // Archivo de salida
-                    proxy: `http://${proxy}` // Usar el proxy
-                });
+            // Descargar audio utilizando el proxy
+            await youtubedl(url, {
+                format: 'bestaudio',   // Descargar solo el audio
+                extractAudio: true,    // Extraer únicamente el audio
+                audioFormat: 'mp3',    // Convertir directamente a MP3
+                output: tempFile,      // Archivo de salida
+                proxy: `http://${proxy}` // Usar el proxy
+            });
 
-                console.log(`Audio descargado y convertido a MP3: ${tempFile}`);
+            console.log(`Audio descargado y convertido a MP3: ${tempFile}`);
 
-                // Enviar el archivo al cliente
-                return res.download(tempFile, 'audio.mp3', (err) => {
-                    if (err) {
-                        console.error(`Error al enviar el archivo al cliente: ${err.message}`);
-                    } else {
-                        console.log('Archivo MP3 enviado al cliente correctamente.');
-                    }
+            // Enviar el archivo al cliente
+            return res.download(tempFile, 'audio.mp3', (err) => {
+                if (err) {
+                    console.error(`Error al enviar el archivo al cliente: ${err.message}`);
+                } else {
+                    console.log('Archivo MP3 enviado al cliente correctamente.');
+                }
 
-                    // Eliminar archivo temporal después de enviarlo
-                    if (fs.existsSync(tempFile)) {
-                        fs.unlinkSync(tempFile);
-                    }
-                });
-            } catch (error) {
-                console.error(`Error al usar el proxy ${proxy}: ${error.message}`);
-                attempt++; // Incrementar intentos en caso de fallo
-            }
+                // Eliminar archivo temporal después de enviarlo
+                if (fs.existsSync(tempFile)) {
+                    fs.unlinkSync(tempFile);
+                }
+            });
+        } catch (error) {
+            console.error(`Error al usar el proxy ${proxy}: ${error.message}`);
+            attempt++; // Incrementar intentos en caso de fallo
         }
-
-        // Si todos los intentos fallan
-        if (fs.existsSync(tempFile)) {
-            fs.unlinkSync(tempFile); // Asegurarse de limpiar cualquier archivo temporal
-        }
-        res.status(500).json({ error: 'No se pudo extraer el audio después de varios intentos.' });
-    } catch (err) {
-        console.error(`Error crítico: ${err.message}`);
-        res.status(500).json({ error: 'Error interno al procesar la solicitud.' });
     }
+
+    // Si todos los intentos fallan
+    if (fs.existsSync(tempFile)) {
+        fs.unlinkSync(tempFile); // Asegurarse de limpiar cualquier archivo temporal
+    }
+    res.status(500).json({ error: 'No se pudo extraer el audio después de varios intentos.' });
 });
 
 module.exports = router;
