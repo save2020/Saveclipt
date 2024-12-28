@@ -39,9 +39,10 @@ router.post('/video', async (req, res) => {
     }
 
     const downloadsDir = ensureDownloadsDir();
-    const videoFile = path.join(downloadsDir, `${Date.now()}_video.mp4`);
-    const audioFile = path.join(downloadsDir, `${Date.now()}_audio.mp4`);
-    const outputFile = path.join(downloadsDir, `${Date.now()}_output.mp4`);
+    const timestamp = Date.now();
+    const videoFile = path.join(downloadsDir, `${timestamp}_video.mp4`);
+    const audioFile = path.join(downloadsDir, `${timestamp}_audio.mp4`);
+    const outputFile = path.join(downloadsDir, `${timestamp}_output.mp4`);
     const maxRetries = 10;
     let attempt = 0;
 
@@ -50,6 +51,7 @@ router.post('/video', async (req, res) => {
         console.log(`Usando proxy: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
 
         try {
+            // Descargar el video
             console.log(`Iniciando descarga del video en el formato ${format_id} desde: ${url}...`);
             await youtubedl(url, {
                 format: format_id,
@@ -57,8 +59,12 @@ router.post('/video', async (req, res) => {
                 proxy: `http://${proxy}`
             });
 
+            if (!fs.existsSync(videoFile)) {
+                throw new Error(`Archivo de video no encontrado: ${videoFile}`);
+            }
             console.log(`Video descargado correctamente: ${videoFile}`);
 
+            // Descargar el audio
             console.log(`Iniciando descarga del mejor audio disponible...`);
             await youtubedl(url, {
                 format: 'bestaudio',
@@ -66,8 +72,12 @@ router.post('/video', async (req, res) => {
                 proxy: `http://${proxy}`
             });
 
+            if (!fs.existsSync(audioFile)) {
+                throw new Error(`Archivo de audio no encontrado: ${audioFile}`);
+            }
             console.log(`Audio descargado correctamente: ${audioFile}`);
 
+            // Combinar video y audio con FFmpeg
             console.log('Iniciando combinación de video y audio...');
             const ffmpeg = spawn('ffmpeg', [
                 '-i', videoFile,
@@ -92,17 +102,18 @@ router.post('/video', async (req, res) => {
                     });
                 } else {
                     console.error(`FFmpeg cerró con código: ${code}`);
-                    res.status(500).send('Error al combinar el video y el audio.');
+                    res.status(500).json({ error: 'Error al combinar el video y el audio.' });
                 }
             });
 
             return;
         } catch (error) {
-            console.error(`Error al usar el proxy ${proxy}: ${error.message}`);
+            console.error(`Error al procesar el video: ${error.message}`);
             attempt++;
         }
     }
 
+    // Limpiar archivos si el proceso falla
     [videoFile, audioFile, outputFile].forEach((file) => {
         if (fs.existsSync(file)) fs.unlinkSync(file);
     });
