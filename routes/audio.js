@@ -22,6 +22,17 @@ function getRandomProxy() {
     return `${proxy.ip}:${proxy.port}`;
 }
 
+// Función para garantizar que el directorio `downloads` exista
+function ensureDownloadsDir() {
+    const downloadsDir = path.join(__dirname, '../downloads');
+    if (!fs.existsSync(downloadsDir)) {
+        fs.mkdirSync(downloadsDir, { recursive: true });
+        console.log(`Directorio creado: ${downloadsDir}`);
+    }
+    return downloadsDir;
+}
+
+// Endpoint para manejar la extracción de audio
 router.post('/audio', async (req, res) => {
     const { url } = req.body;
 
@@ -29,15 +40,8 @@ router.post('/audio', async (req, res) => {
         return res.status(400).json({ error: 'La URL es requerida.' });
     }
 
-    // Ruta del directorio downloads
-    const downloadsDir = path.join(__dirname, '../downloads');
-
-    // Verificar y crear el directorio si no existe
-    if (!fs.existsSync(downloadsDir)) {
-        fs.mkdirSync(downloadsDir, { recursive: true });
-        console.log(`Directorio creado: ${downloadsDir}`);
-    }
-
+    // Asegurar que el directorio `downloads` exista
+    const downloadsDir = ensureDownloadsDir();
     const tempFile = path.join(downloadsDir, `${Date.now()}.mp3`);
     const maxRetries = 10; // Número máximo de reintentos
     let attempt = 0;
@@ -85,6 +89,5 @@ router.post('/audio', async (req, res) => {
     }
     res.status(500).json({ error: 'No se pudo extraer el audio después de varios intentos.' });
 });
-
 
 module.exports = router;
