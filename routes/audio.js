@@ -22,7 +22,7 @@ function getRandomProxy() {
     return `${proxy.ip}:${proxy.port}`;
 }
 
-router.post('/:lang/audio', async (req, res) => {
+router.post('/audio', async (req, res) => {
     const { url } = req.body;
     const { lang } = req.params; // Obtener el idioma dinámicamente (es, en, chino, etc.)
 
