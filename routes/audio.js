@@ -14,11 +14,8 @@ function getRandomProxy() {
     const proxy = proxies[randomIndex];
 
     if (proxy.username && proxy.password) {
-        // Proxy con autenticación
         return `${proxy.username}:${proxy.password}@${proxy.ip}:${proxy.port}`;
     }
-
-    // Proxy sin autenticación
     return `${proxy.ip}:${proxy.port}`;
 }
 
@@ -55,10 +52,10 @@ router.post('/audio', async (req, res) => {
 
             // Descargar audio utilizando el proxy
             await youtubedl(url, {
-                format: 'bestaudio',   // Descargar solo el audio
-                extractAudio: true,    // Extraer únicamente el audio
-                audioFormat: 'mp3',    // Convertir directamente a MP3
-                output: tempFile,      // Archivo de salida
+                format: 'bestaudio', // Descargar solo el audio
+                extractAudio: true,  // Extraer únicamente el audio
+                audioFormat: 'mp3',  // Convertir directamente a MP3
+                output: tempFile,    // Archivo de salida
                 proxy: `http://${proxy}` // Usar el proxy
             });
 
