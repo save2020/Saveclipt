@@ -31,9 +31,16 @@ router.post('/video', async (req, res) => {
         return res.status(400).json({ error: 'La URL y el formato son requeridos.' });
     }
 
-    const videoFile = path.join(__dirname, '../downloads', `${Date.now()}_video.mp4`);
-    const audioFile = path.join(__dirname, '../downloads', `${Date.now()}_audio.mp4`);
-    const outputFile = path.join(__dirname, '../downloads', `${Date.now()}_output.mp4`);
+    // Asegurar que el directorio `downloads` exista
+    const downloadsDir = path.join(__dirname, '../downloads');
+    if (!fs.existsSync(downloadsDir)) {
+        fs.mkdirSync(downloadsDir, { recursive: true });
+        console.log(`Directorio creado: ${downloadsDir}`);
+    }
+
+    const videoFile = path.join(downloadsDir, `${Date.now()}_video.mp4`);
+    const audioFile = path.join(downloadsDir, `${Date.now()}_audio.mp4`);
+    const outputFile = path.join(downloadsDir, `${Date.now()}_output.mp4`);
     const maxRetries = 10; // Número máximo de reintentos
     let attempt = 0;
 

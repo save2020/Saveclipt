@@ -24,13 +24,21 @@ function getRandomProxy() {
 
 router.post('/audio', async (req, res) => {
     const { url } = req.body;
-    const { lang } = req.params; // Obtener el idioma dinámicamente (es, en, chino, etc.)
 
     if (!url) {
         return res.status(400).json({ error: 'La URL es requerida.' });
     }
 
-    const tempFile = path.join(__dirname, '../downloads', `${Date.now()}.mp3`);
+    // Ruta del directorio downloads
+    const downloadsDir = path.join(__dirname, '../downloads');
+
+    // Verificar y crear el directorio si no existe
+    if (!fs.existsSync(downloadsDir)) {
+        fs.mkdirSync(downloadsDir, { recursive: true });
+        console.log(`Directorio creado: ${downloadsDir}`);
+    }
+
+    const tempFile = path.join(downloadsDir, `${Date.now()}.mp3`);
     const maxRetries = 10; // Número máximo de reintentos
     let attempt = 0;
 
