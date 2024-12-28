@@ -17,17 +17,31 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-// Función para obtener un proxy aleatorio
-const proxies = JSON.parse(fs.readFileSync('proxies.json', 'utf-8'));
-function getRandomProxy() {
-    const randomIndex = Math.floor(Math.random() * proxies.length);
-    return `${proxies[randomIndex].ip}:${proxies[randomIndex].port}`;
-}
+// Función para detectar el idioma del navegador o cliente
+app.use((req, res, next) => {
+  const acceptLanguage = req.headers['accept-language'] || '';
+  const primaryLanguage = acceptLanguage.split(',')[0].split('-')[0]; // Detectar idioma principal
+
+  // Redirigir automáticamente a la ruta correspondiente si no se especifica un idioma
+  if (!req.url.startsWith('/en') && !req.url.startsWith('/es') && !req.url.startsWith('/chino')) {
+    switch (primaryLanguage) {
+      case 'en': // Inglés
+        return res.redirect(`/en${req.url}`);
+      case 'es': // Español
+        return res.redirect(`/es${req.url}`);
+      case 'zh': // Chino
+        return res.redirect(`/chino${req.url}`);
+      default:
+        return res.redirect(`/en${req.url}`); // Idioma predeterminado: inglés
+    }
+  }
+  next();
+});
 
 // Rutas estáticas para los idiomas
 app.use('/en', express.static(path.join(__dirname, 'public/en')));
 app.use('/es', express.static(path.join(__dirname, 'public/es')));
-app.use('/es', express.static(path.join(__dirname, 'public/chino')));
+app.use('/chino', express.static(path.join(__dirname, 'public/chino')));
 
 // Rutas amigables para las páginas principales
 app.get('/es', (req, res) => {
