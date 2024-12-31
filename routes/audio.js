@@ -8,10 +8,12 @@ const router = express.Router();
 // Cargar proxies desde un archivo
 const proxies = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies.json'), 'utf-8'));
 
-// Función para seleccionar un proxy aleatorio
-function getRandomProxy() {
-    const randomIndex = Math.floor(Math.random() * proxies.length);
-    const proxy = proxies[randomIndex];
+// Función para seleccionar un proxy aleatorio y excluir los fallidos
+function getRandomProxy(usedProxies) {
+    const availableProxies = proxies.filter(proxy => !usedProxies.includes(proxy.ip));
+    if (availableProxies.length === 0) return null; // No hay más proxies disponibles
+    const randomIndex = Math.floor(Math.random() * availableProxies.length);
+    const proxy = availableProxies[randomIndex];
 
     if (proxy.username && proxy.password) {
         // Proxy con autenticación
@@ -45,9 +47,15 @@ router.post('/audio', async (req, res) => {
     const tempFile = path.join(downloadsDir, `${Date.now()}.mp3`);
     const maxRetries = 10; // Número máximo de reintentos
     let attempt = 0;
+    const usedProxies = []; // Proxies que ya fallaron
 
     while (attempt < maxRetries) {
-        const proxy = getRandomProxy();
+        const proxy = getRandomProxy(usedProxies);
+        if (!proxy) {
+            console.error('No hay más proxies disponibles para intentar.');
+            break;
+        }
+        usedProxies.push(proxy);
         console.log(`Usando proxy: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
 
         try {
@@ -63,6 +71,11 @@ router.post('/audio', async (req, res) => {
             });
 
             console.log(`Audio descargado y convertido a MP3: ${tempFile}`);
+
+            // Verificar si el archivo fue creado correctamente
+            if (!fs.existsSync(tempFile)) {
+                throw new Error('El archivo de audio no se creó correctamente.');
+            }
 
             // Enviar el archivo al cliente
             return res.download(tempFile, 'audio.mp3', (err) => {
