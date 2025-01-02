@@ -1,27 +1,64 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="../logo2.png" type="image/x-icon">
-  <title>SaveClip</title>
-  <link rel="stylesheet" href="../styles.css">
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Descarga videos de YouTube rápido y fácil con SaveClip. Obtén videos en MP4 y MP3 de alta calidad sin registro ni instalación.">
+    <meta name="keywords" content="descargar videos YouTube, convertir YouTube a MP3, descargar MP4 alta calidad, herramienta descarga YouTube">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="SaveClip">
+    <meta name="copyright" content="© 2024 SaveClip">
+    <meta property="og:title" content="SaveClip - Descarga videos de YouTube rápido y fácil">
+    <meta property="og:description" content="Descarga videos y audio en alta calidad con SaveClip. Compatible con PC, Mac, Android e iOS.">
+    <meta property="og:image" content="https://saveclipt.com/logo2.png">
+    <meta property="og:url" content="https://saveclipt.com">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SaveClip - Descarga videos de YouTube rápido y fácil">
+    <meta name="twitter:description" content="Descarga videos y audio en alta calidad con SaveClip. Compatible con todos los dispositivos.">
+    <meta name="twitter:image" content="https://saveclipt.com/logo2.png">
+    <link rel="canonical" href="https://saveclipt.com">
+    <link rel="icon" href="https://saveclipt.com/logo2.png" type="image/x-icon">
+    <title>SaveClip - Descarga videos de YouTube fácil y rápido</title>
+    <link rel="stylesheet" href="../styles.css">
+  
+    <!-- Datos estructurados para alcance global -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "SaveClip",
+      "description": "Descarga videos de YouTube rápido y fácil con SaveClip. Obtén videos y audios en alta calidad sin registro.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "SaveClip",
+        "logo": "https://saveclipt.com/logo2.png",
+        "url": "https://saveclipt.com"
+      },
+      "inLanguage": "es",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://saveclipt.com/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+  </head>
+  
 <body>
   <header>
     <div class="header-container">
       <div class="logo">
         <a href="esindex.html" class="logo-link">
-          <img src="../logo2.png" alt="Logo de SaveClip" class="logo-img">
+          <img src="../logo2.png" alt="Logo SaveClip, herramienta para descargar videos de YouTube" class="logo-img" loading="lazy">
           <h1 class="logo-title">SAVECLIP</h1>
         </a>
       </div>
-      
       <nav>
         <ul class="nav-links">
           <li><a href="#caracteristicas">Características</a></li>
-          <li><a href="#como-descargar">Cómo Descargar</a></li>
-          <li><a href="#limites">Límites y Sugerencias</a></li>
+          <li><a href="#como-descargar">Instruciones</a></li>
+          <li><a href="#limites">Sugerencias</a></li>
         </ul>
       </nav>
     </div>
@@ -35,21 +72,19 @@
     </div>
   </section>
 
-  <div class="container">
-    <main id="infoForm">
+  <div  class="container">
+      <main id="infoForm">
       <form>
-        <input type="url" id="videoUrl" placeholder="Ingresa la URL del video" required />
+        <input type="url" id="videoUrl" placeholder="Ingresa la URL del video" required>
         <button type="submit">Buscar Video</button>
       </form>
 
       <div id="videoPreview" class="hidden">
         <h3 id="videoTitle"></h3>
-        <img id="videoThumbnail" alt="Vista previa" />
+        <img id="videoThumbnail" alt="Vista previa" loading="lazy">
         <iframe id="videoPlayer" src="" frameborder="0" allowfullscreen></iframe>
-      
         <label for="qualitySelect">Selecciona una calidad:</label>
         <select id="qualitySelect"></select>
-      
         <div class="download-options">
           <label>
             <input type="radio" name="type" value="video" checked> Video (MP4)
@@ -58,16 +93,13 @@
             <input type="radio" name="type" value="audio"> Solo Audio (MP3)
           </label>
         </div>
-      
         <button id="downloadButton">Descargar</button>
         <button id="clearPreview" class="hidden">Limpiar</button>
       </div>
-      
       <p id="status" class="status-message"></p>
+      </main>
 
-    </main>
-
-    <section id="caracteristicas">
+      <section id="caracteristicas">
       <h2>Características Principales</h2>
       <p>Nuestra herramienta gratuita para descargar videos de YouTube está diseñada para ser rápida, segura y fácil de usar.</p>
       <ul>
@@ -77,9 +109,9 @@
         <li>Convierte videos de YouTube a MP3 en segundos.</li>
         <li>Soporte para múltiples resoluciones: 720p, 1080p y 4K.</li>
       </ul>
-    </section>
+      </section>
 
-    <section id="como-descargar">
+      <section id="como-descargar">
       <h2>Cómo Descargar Videos de YouTube</h2>
       <ol>
         <li>Copia el enlace del video de YouTube que deseas descargar.</li>
@@ -88,27 +120,27 @@
         <li>Presiona el botón "Descargar" y obtén el archivo en unos segundos.</li>
       </ol>
       <p>Descargar videos de YouTube nunca ha sido tan fácil. Nuestra plataforma garantiza una experiencia sin interrupciones y descargas rápidas.</p>
+      </section>
+
+      <section id="limites">
+        <h2>Límites y Recomendaciones</h2>
+        <p>Nuestra herramienta está diseñada para ofrecer un servicio eficiente, pero es importante considerar las siguientes limitaciones:</p>
+        <ul>
+            <li><strong>Duración máxima de videos:</strong> Los videos de más de 50 minutos no pueden ser procesados.</li>
+            <li><strong>Tiempo de conversión:</strong> Convertir un video suele tomar entre 1 y 2 minutos, dependiendo de su tamaño y duración.</li>
+           
+        </ul>
+        <p><strong>Recomendación:</strong> Para una experiencia más fluida, sugerimos procesar videos de menor duración o aquellos que no requieran conversión adicional.</p>
     </section>
+    
+     </div>
 
-    <section id="limites">
-      <h2>Límites y Sugerencias</h2>
-      <p>Actualmente, nuestra herramienta tiene las siguientes limitaciones:</p>
-      <ul>
-        <li><strong>Videos mayores a 50 minutos:</strong> No es posible convertir videos de una duración superior a 50 minutos.</li>
-        <li><strong>Tiempo de conversión:</strong> El tiempo estimado de conversión es de 1-2 minutos por video.</li>
-        <li><strong>Videos de 4-5 minutos:</strong> Nuestra herramienta descarga estos videos en cuestión de segundos, brindando una experiencia rápida y eficiente.</li>
-      </ul>
-      <p>Para una experiencia más fluida, recomendamos descargar videos que no requieran conversión adicional o que sean de menor duración.</p>
-    </section>
-
-  </div>
-
-  <footer>
-    <div class="footer-container">
+      <footer>
+      <div class="footer-container">
       <p>&copy; 2024 SaveClip. Todos los derechos reservados.</p>
       <p><a href="espoliticas-de-privacidad.html">Política de Privacidad</a> | <a href="esterminos-y-condiciones.html">Términos de Uso</a></p>
-    </div>
-  </footer>
+      </div>
+     </footer>
 
   <script src="../script.js"></script>
 </body>
