@@ -293,7 +293,7 @@ body {
     transform: scale(1.1);
   }
 
-  .terms-block {
+.terms-block {
     max-width: 700px;
     margin: 30px auto;
     padding: 20px;
@@ -302,28 +302,30 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     text-align: left; /* Alineación a la izquierda para mejor lectura */
     line-height: 1.8;
-  }
+}
 
-  .terms-block h1, .terms-block h2 {
+.terms-block h1, .terms-block h2 {
     color: #00bcd4;
     text-align: center;
     margin-bottom: 15px;
-  }
+}
 
-  .terms-block p {
+.terms-block p {
     font-size: 1.2rem;
     margin-bottom: 20px;
-  }
+    color: #000; /* Color negro para el texto */
+}
 
-  .terms-block ul {
+.terms-block ul {
     list-style-type: disc;
     padding-left: 20px;
     margin-bottom: 20px;
-  }
+    color: #000; /* Asegurar que las listas también tengan texto negro */
+}
 
-  .terms-block ul li {
+.terms-block ul li {
     margin-bottom: 10px;
-  }
+}
 
 
 
