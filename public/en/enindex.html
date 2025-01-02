@@ -1,27 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="../logo2.png" type="image/x-icon">
-  <title>SaveClip</title>
-  <link rel="stylesheet" href="../styles.css">
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Download YouTube videos quickly and easily with SaveClip. Get high-quality MP4 and MP3 videos without registration or installation.">
+    <meta name="keywords" content="download YouTube videos, convert YouTube to MP3, download high-quality MP4, YouTube download tool">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="SaveClip">
+    <meta name="copyright" content="© 2024 SaveClip">
+    <meta property="og:title" content="SaveClip - Download YouTube Videos Quickly and Easily">
+    <meta property="og:description" content="Download high-quality videos and audio with SaveClip. Compatible with PC, Mac, Android, and iOS.">
+    <meta property="og:image" content="https://saveclipt.com/logo2.png">
+    <meta property="og:url" content="https://saveclipt.com">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SaveClip - Download YouTube Videos Quickly and Easily">
+    <meta name="twitter:description" content="Download high-quality videos and audio with SaveClip. Compatible with all devices.">
+    <meta name="twitter:image" content="https://saveclipt.com/logo2.png">
+    <link rel="canonical" href="https://saveclipt.com">
+    <link rel="icon" href="https://saveclipt.com/logo2.png" type="image/x-icon">
+    <title>SaveClip - Download YouTube Videos Quickly and Easily</title>
+    <link rel="stylesheet" href="../styles.css">
+
+    <!-- Structured Data for Global Reach -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "SaveClip",
+      "description": "Download YouTube videos quickly and easily with SaveClip. Get high-quality videos and audio without registration.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "SaveClip",
+        "logo": "https://saveclipt.com/logo2.png",
+        "url": "https://saveclipt.com"
+      },
+      "inLanguage": "en",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://saveclipt.com/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+  </head>
+
 <body>
   <header>
     <div class="header-container">
       <div class="logo">
-        <a href="enindex.html" class="logo-link">
-          <img src="../logo2.png" alt="SaveClip Logo" class="logo-img">
+        <a href="index.html" class="logo-link">
+          <img src="../logo2.png" alt="SaveClip Logo, YouTube video download tool" class="logo-img" loading="lazy">
           <h1 class="logo-title">SAVECLIP</h1>
         </a>
       </div>
-      
       <nav>
         <ul class="nav-links">
-          <li><a href="#caracteristicas">Features</a></li>
-          <li><a href="#como-descargar">How to Download</a></li>
-          <li><a href="#limites">Limits and Suggestions</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how-to-download">Instructions</a></li>
+          <li><a href="#limitations">Suggestions</a></li>
         </ul>
       </nav>
     </div>
@@ -30,7 +67,7 @@
   <section class="hero">
     <div class="hero-content">
       <h2>Download Your Favorite YouTube Videos</h2>
-      <p>Fast, safe, and easy to use. Get videos and audio in the best quality.</p>
+      <p>Fast, secure, and easy to use. Get videos and audio in the best quality.</p>
       <a href="#infoForm" class="hero-btn">Start Now</a>
     </div>
   </section>
@@ -38,18 +75,16 @@
   <div class="container">
     <main id="infoForm">
       <form>
-        <input type="url" id="videoUrl" placeholder="Enter the video URL" required />
+        <input type="url" id="videoUrl" placeholder="Enter the video URL" required>
         <button type="submit">Search Video</button>
       </form>
 
       <div id="videoPreview" class="hidden">
         <h3 id="videoTitle"></h3>
-        <img id="videoThumbnail" alt="Preview" />
+        <img id="videoThumbnail" alt="Preview" loading="lazy">
         <iframe id="videoPlayer" src="" frameborder="0" allowfullscreen></iframe>
-      
         <label for="qualitySelect">Select a quality:</label>
         <select id="qualitySelect"></select>
-      
         <div class="download-options">
           <label>
             <input type="radio" name="type" value="video" checked> Video (MP4)
@@ -58,18 +93,15 @@
             <input type="radio" name="type" value="audio"> Audio Only (MP3)
           </label>
         </div>
-      
         <button id="downloadButton">Download</button>
         <button id="clearPreview" class="hidden">Clear</button>
       </div>
-      
       <p id="status" class="status-message"></p>
-
     </main>
 
-    <section id="caracteristicas">
+    <section id="features">
       <h2>Main Features</h2>
-      <p>Our free YouTube video downloader is designed to be fast, safe, and easy to use.</p>
+      <p>Our free YouTube video downloader tool is designed to be fast, secure, and easy to use.</p>
       <ul>
         <li>High-quality downloads (MP4, MP3, and more formats available).</li>
         <li>Compatible with all devices: PC, Mac, Android, and iOS.</li>
@@ -79,34 +111,32 @@
       </ul>
     </section>
 
-    <section id="como-descargar">
+    <section id="how-to-download">
       <h2>How to Download YouTube Videos</h2>
       <ol>
         <li>Copy the link of the YouTube video you want to download.</li>
-        <li>Paste the video URL into the "Enter the video URL" field in our tool.</li>
-        <li>Select the desired format and quality (MP4 video or MP3 audio).</li>
-        <li>Press the "Download" button and get the file in a few seconds.</li>
+        <li>Paste the video URL into the "Enter the video URL" field of our tool.</li>
+        <li>Select your desired format and quality (MP4 video or MP3 audio).</li>
+        <li>Press the "Download" button and get your file in seconds.</li>
       </ol>
       <p>Downloading YouTube videos has never been easier. Our platform ensures a seamless experience and fast downloads.</p>
     </section>
 
-    <section id="limites">
-      <h2>Limits and Suggestions</h2>
-      <p>Currently, our tool has the following limitations:</p>
+    <section id="limitations">
+      <h2>Limits and Recommendations</h2>
+      <p>Our tool is designed to offer an efficient service, but it is important to consider the following limitations:</p>
       <ul>
-        <li><strong>Videos longer than 50 minutes:</strong> It is not possible to convert videos longer than 50 minutes.</li>
-        <li><strong>Conversion time:</strong> The estimated conversion time is 1-2 minutes per video.</li>
-        <li><strong>Videos of 4-5 minutes:</strong> Our tool downloads these videos in seconds, providing a quick and efficient experience.</li>
+        <li><strong>Maximum video duration:</strong> Videos longer than 50 minutes cannot be processed.</li>
+        <li><strong>Conversion time:</strong> Converting a video usually takes 1-2 minutes, depending on its size and duration.</li>
       </ul>
-      <p>For a smoother experience, we recommend downloading videos that do not require additional conversion or are shorter in length.</p>
+      <p><strong>Recommendation:</strong> For a smoother experience, we suggest processing shorter videos or those that do not require additional conversion.</p>
     </section>
-
   </div>
 
   <footer>
     <div class="footer-container">
       <p>&copy; 2024 SaveClip. All rights reserved.</p>
-      <p><a href="enprivacy-policy.html">Privacy Policy</a> | <a href="enterms-and-conditions.html">Terms of Use</a></p>
+      <p><a href="enprivacypolicy.html">Privacy Policy</a> | <a href="entermsconditions.html">Terms of Use</a></p>
     </div>
   </footer>
 
