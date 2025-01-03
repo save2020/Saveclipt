@@ -8,17 +8,16 @@ const router = express.Router();
 // Cargar proxies desde un archivo
 const proxies = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies.json'), 'utf-8'));
 
-// Función para seleccionar un proxy aleatorio
-function getRandomProxy() {
-    const randomIndex = Math.floor(Math.random() * proxies.length);
-    const proxy = proxies[randomIndex];
+// Función para seleccionar un proxy aleatorio y excluir los fallidos
+function getRandomProxy(usedProxies) {
+    const availableProxies = proxies.filter((proxy) => !usedProxies.includes(proxy.ip));
+    if (availableProxies.length === 0) return null; // No hay más proxies disponibles
+    const randomIndex = Math.floor(Math.random() * availableProxies.length);
+    const proxy = availableProxies[randomIndex];
 
     if (proxy.username && proxy.password) {
-        // Proxy con autenticación
         return `${proxy.username}:${proxy.password}@${proxy.ip}:${proxy.port}`;
     }
-
-    // Proxy sin autenticación
     return `${proxy.ip}:${proxy.port}`;
 }
 
@@ -35,7 +34,6 @@ router.get('/progress/:id', (req, res) => {
 // Endpoint para obtener información del video con rotación de proxies
 router.post('/info', async (req, res) => {
     const { url } = req.body;
-    const { lang } = req.params; // Capturar el idioma de la ruta
     const requestId = `${Date.now()}-${Math.random()}`; // Generar un ID único para esta solicitud
     progressTracker[requestId] = 0; // Inicializar progreso
 
@@ -43,11 +41,17 @@ router.post('/info', async (req, res) => {
         return res.status(400).json({ error: 'La URL es requerida.' });
     }
 
-    const maxRetries = 10; // Número máximo de reintentos
+    const maxRetries = 25; // Número máximo de reintentos
     let attempt = 0;
+    const usedProxies = []; // Lista de proxies ya utilizados
 
     while (attempt < maxRetries) {
-        const proxy = getRandomProxy();
+        const proxy = getRandomProxy(usedProxies);
+        if (!proxy) {
+            console.error('No hay más proxies disponibles para intentar.');
+            break;
+        }
+        usedProxies.push(proxy);
         console.log(`Usando proxy: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
 
         try {
@@ -67,6 +71,7 @@ router.post('/info', async (req, res) => {
             clearInterval(interval); // Detener el incremento del progreso
             progressTracker[requestId] = 100; // Marcar progreso como completo
 
+            // Filtrar formatos deseados
             const desiredQualities = [360, 720, 1080];
             const formats = info.formats
                 .filter((f) => f.ext === 'mp4' && desiredQualities.includes(f.height)) // Solo MP4 y calidades deseadas
@@ -79,6 +84,7 @@ router.post('/info', async (req, res) => {
                     filesize: f.filesize ? `${(f.filesize / (1024 * 1024)).toFixed(2)} MB` : 'Desconocido',
                 }));
 
+            // Agrupar formatos que no requieren combinación
             const groupNoMerge = [];
             const seenNoMerge = new Set();
 
@@ -89,18 +95,19 @@ router.post('/info', async (req, res) => {
                 }
             });
 
+            // Duración del video
             const videoDuration = info.duration; // Duración en segundos
             const durationInMinutes = Math.floor(videoDuration / 60);
 
             if (durationInMinutes > 50) {
                 if (groupNoMerge.length === 0) {
-                    clearInterval(interval); // Asegurarse de detener el intervalo
+                    clearInterval(interval); // Detener el intervalo
                     delete progressTracker[requestId]; // Limpiar progreso
                     return res.status(400).json({
                         error: 'No hay formatos disponibles con audio y video para este video.',
                     });
                 }
-                clearInterval(interval); // Detener el intervalo si hay un éxito
+                clearInterval(interval); // Detener el intervalo si hay éxito
                 delete progressTracker[requestId]; // Limpiar progreso
                 return res.json({
                     title: info.title,
@@ -111,6 +118,7 @@ router.post('/info', async (req, res) => {
                 });
             }
 
+            // Agrupar formatos que requieren combinación
             const groupRequiresMerge = [];
             const seenRequiresMerge = new Set();
 

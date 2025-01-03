@@ -34,6 +34,14 @@ function ensureDownloadsDir() {
     return downloadsDir;
 }
 
+// Función para limpiar archivos temporales
+function cleanUpFile(filePath) {
+    if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        console.log(`Archivo temporal eliminado: ${filePath}`);
+    }
+}
+
 // Endpoint para manejar la extracción de audio
 router.post('/audio', async (req, res) => {
     const { url } = req.body;
@@ -45,7 +53,7 @@ router.post('/audio', async (req, res) => {
     // Asegurar que el directorio `downloads` exista
     const downloadsDir = ensureDownloadsDir();
     const tempFile = path.join(downloadsDir, `${Date.now()}.mp3`);
-    const maxRetries = 10; // Número máximo de reintentos
+    const maxRetries = 25; // Número máximo de reintentos
     let attempt = 0;
     const usedProxies = []; // Proxies que ya fallaron
 
@@ -86,9 +94,7 @@ router.post('/audio', async (req, res) => {
                 }
 
                 // Eliminar archivo temporal después de enviarlo
-                if (fs.existsSync(tempFile)) {
-                    fs.unlinkSync(tempFile);
-                }
+                cleanUpFile(tempFile);
             });
         } catch (error) {
             console.error(`Error al usar el proxy ${proxy}: ${error.message}`);
@@ -97,9 +103,7 @@ router.post('/audio', async (req, res) => {
     }
 
     // Si todos los intentos fallan
-    if (fs.existsSync(tempFile)) {
-        fs.unlinkSync(tempFile); // Asegurarse de limpiar cualquier archivo temporal
-    }
+    cleanUpFile(tempFile);
     res.status(500).json({ error: 'No se pudo extraer el audio después de varios intentos.' });
 });
 

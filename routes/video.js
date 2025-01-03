@@ -32,6 +32,16 @@ function ensureDownloadsDir() {
     return downloadsDir;
 }
 
+// Función para limpiar archivos temporales
+function cleanUpFiles(...files) {
+    files.forEach((file) => {
+        if (fs.existsSync(file)) {
+            fs.unlinkSync(file);
+            console.log(`Archivo temporal eliminado: ${file}`);
+        }
+    });
+}
+
 // Endpoint para manejar la conversión de videos
 router.post('/video', async (req, res) => {
     const { url, format_id } = req.body;
@@ -41,10 +51,11 @@ router.post('/video', async (req, res) => {
     }
 
     const downloadsDir = ensureDownloadsDir();
-    const videoFile = path.join(downloadsDir, `${Date.now()}_video.mp4`);
-    const audioFile = path.join(downloadsDir, `${Date.now()}_audio.mp4`);
-    const outputFile = path.join(downloadsDir, `${Date.now()}_output.mp4`);
-    const maxRetries = 10; 
+    const timestamp = Date.now();
+    const videoFile = path.join(downloadsDir, `${timestamp}_video.mp4`);
+    const audioFile = path.join(downloadsDir, `${timestamp}_audio.mp4`);
+    const outputFile = path.join(downloadsDir, `${timestamp}_output.mp4`);
+    const maxRetries = 25; 
     let attempt = 0;
     const usedProxies = [];
 
@@ -100,12 +111,11 @@ router.post('/video', async (req, res) => {
                 if (code === 0) {
                     console.log(`Combinación completada: ${outputFile}`);
                     res.download(outputFile, 'video_con_audio.mp4', () => {
-                        if (fs.existsSync(videoFile)) fs.unlinkSync(videoFile);
-                        if (fs.existsSync(audioFile)) fs.unlinkSync(audioFile);
-                        if (fs.existsSync(outputFile)) fs.unlinkSync(outputFile);
+                        cleanUpFiles(videoFile, audioFile, outputFile);
                     });
                 } else {
                     console.error(`FFmpeg cerró con código: ${code}`);
+                    cleanUpFiles(videoFile, audioFile, outputFile);
                     res.status(500).send('Error al combinar el video y el audio.');
                 }
             });
@@ -114,12 +124,12 @@ router.post('/video', async (req, res) => {
         } catch (error) {
             console.error(`Error al usar el proxy ${proxy}: ${error.message}`);
             attempt++;
+            cleanUpFiles(videoFile, audioFile, outputFile);
         }
     }
 
     // Si todos los intentos fallan
-    if (fs.existsSync(videoFile)) fs.unlinkSync(videoFile);
-    if (fs.existsSync(audioFile)) fs.unlinkSync(audioFile);
+    cleanUpFiles(videoFile, audioFile, outputFile);
     res.status(500).json({ error: 'No se pudo procesar el video después de varios intentos.' });
 });
 
