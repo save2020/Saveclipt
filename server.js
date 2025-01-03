@@ -8,6 +8,7 @@ const path = require('path');
 const infoRoutes = require('./routes/info');
 const audioRoutes = require('./routes/audio');
 const videoRoutes = require('./routes/video');
+const directRoutes = require('./routes/direct');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -84,6 +85,7 @@ app.get('/chino/chinoter', (req, res) => {
 app.use('/:lang/api', infoRoutes); // Información del video
 app.use('/:lang/api', audioRoutes); // Manejo de audio
 app.use('/:lang/api', videoRoutes); // Manejo de videos
+app.use('/:lang/api', directRoutes); // Manejo de direct
 
 // Iniciar el servidor
 app.listen(PORT, () => {

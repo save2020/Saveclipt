@@ -121,7 +121,7 @@ infoForm.addEventListener('submit', async (e) => {
       data.formats.no_merge.forEach((format) => {
         const option = document.createElement('option');
         option.value = JSON.stringify(format);
-        option.textContent = `${format.quality} - ${format.filesize} (${t('noConversion')})`;
+        option.textContent = `${format.quality} - ${format.filesize || 'Desconocido'} (${t('noConversion')})`;
         noMergeGroup.appendChild(option);
       });
       qualitySelect.appendChild(noMergeGroup);
@@ -133,7 +133,7 @@ infoForm.addEventListener('submit', async (e) => {
       data.formats.requires_merge.forEach((format) => {
         const option = document.createElement('option');
         option.value = JSON.stringify(format);
-        option.textContent = `${format.quality} - ${format.filesize} (${t('requiresConversion')})`;
+        option.textContent = `${format.quality} - ${format.filesize || 'Desconocido'} (${t('requiresConversion')})`;
         requiresMergeGroup.appendChild(option);
       });
       qualitySelect.appendChild(requiresMergeGroup);
@@ -159,6 +159,7 @@ downloadButton.addEventListener('click', async () => {
 
   if (type === 'video') {
     if (format.requires_merge) {
+      // Descarga con conversión
       startProcessing(t('startingVideoConversion'));
       try {
         const response = await fetch(`${apiBaseUrl}/video`, {
@@ -181,22 +182,31 @@ downloadButton.addEventListener('click', async () => {
         stopProcessing(error.message);
       }
     } else {
+      // Descarga directa (sin conversión)
       startProcessing(t('startingQuickDownload'));
       try {
+        const response = await fetch(`${apiBaseUrl}/direct`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ direct_url: format.url }),
+        });
+
+        if (!response.ok) throw new Error(t('errorDuringDownload'));
+
+        const blob = await response.blob();
         const link = document.createElement('a');
-        link.href = format.url;
+        link.href = URL.createObjectURL(blob);
         link.download = `${videoTitle.textContent}.mp4`;
-        document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
 
         stopProcessing(t('downloadCompleted'));
         resetForm();
       } catch (error) {
-        stopProcessing(t('errorDuringDownload'));
+        stopProcessing(error.message);
       }
     }
   } else if (type === 'audio') {
+    // Descarga de solo audio
     startProcessing(t('startingAudioExtraction'));
     try {
       const response = await fetch(`${apiBaseUrl}/audio`, {
@@ -220,4 +230,3 @@ downloadButton.addEventListener('click', async () => {
     }
   }
 });
-
