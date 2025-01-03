@@ -6,7 +6,7 @@ const fs = require('fs');
 const router = express.Router();
 
 // Cargar proxies desde un archivo
-const proxies = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies.json'), 'utf-8'));
+const proxies = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies_download.json'), 'utf-8'));
 
 // Función para seleccionar un proxy aleatorio y excluir los fallidos
 function getRandomProxy(usedProxies) {
@@ -53,7 +53,7 @@ router.post('/audio', async (req, res) => {
     // Asegurar que el directorio `downloads` exista
     const downloadsDir = ensureDownloadsDir();
     const tempFile = path.join(downloadsDir, `${Date.now()}.mp3`);
-    const maxRetries = 25; // Número máximo de reintentos
+    const maxRetries = 5; // Número máximo de reintentos
     let attempt = 0;
     const usedProxies = []; // Proxies que ya fallaron
 
