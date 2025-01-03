@@ -386,3 +386,78 @@ body {
     margin-bottom: 10px; 
     display: block; 
   }
+
+  .updates {
+    background-color: #e0f7fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border: 2px solid #00796b;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .updates-content h2 {
+    color: #004d40;
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 24px;
+  }
+  
+  .updates-content .updates-list {
+    max-height: 200px; /* Altura máxima para el scroll */
+    overflow-y: auto; /* Habilitar scroll vertical */
+    padding: 10px;
+    border: 2px solid #004d40;
+    background-color: #ffffff;
+    border-radius: 8px;
+  }
+  
+  .updates-content ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .updates-content li {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #b2dfdb;
+    border-radius: 5px;
+    background-color: #f1f8e9;
+    transition: background-color 0.3s;
+  }
+  
+  .updates-content li:hover {
+    background-color: #dcedc8; /* Cambiar color al pasar el mouse */
+  }
+  
+  .updates-content p {
+    margin: 5px 0;
+    font-size: 14px;
+  }
+  
+  .updates-content strong {
+    color: #00796b;
+  }
+  
+  .updates-content p strong {
+    font-weight: bold;
+  }
+  .alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 1px solid;
+  }
+  
+  .alert-warning {
+    background-color: #fff3cd; /* Amarillo claro */
+    color: #856404; /* Marrón oscuro */
+    border-color: #ffeeba; /* Amarillo más oscuro */
+  }
+  
+  .alert p {
+    margin: 0;
+    font-size: 16px;
+  }
+  
