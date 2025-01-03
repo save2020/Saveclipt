@@ -7,7 +7,7 @@ const { spawn } = require('child_process');
 const router = express.Router();
 
 // Cargar proxies desde un archivo
-const proxies = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies.json'), 'utf-8'));
+const proxies = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies_download.json'), 'utf-8'));
 
 // Función para seleccionar un proxy aleatorio y excluir los fallidos
 function getRandomProxy(usedProxies) {
@@ -55,7 +55,7 @@ router.post('/video', async (req, res) => {
     const videoFile = path.join(downloadsDir, `${timestamp}_video.mp4`);
     const audioFile = path.join(downloadsDir, `${timestamp}_audio.mp4`);
     const outputFile = path.join(downloadsDir, `${timestamp}_output.mp4`);
-    const maxRetries = 25; 
+    const maxRetries = 3; 
     let attempt = 0;
     const usedProxies = [];
 
