@@ -6,7 +6,7 @@ const path = require('path');
 const router = express.Router();
 
 // Cargar proxies desde un archivo
-const proxies = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies_info.json'), 'utf-8'));
+const proxies = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies_download.json'), 'utf-8'));
 
 // Función para seleccionar un proxy aleatorio y excluir los fallidos
 function getRandomProxy(usedProxies) {
@@ -41,7 +41,7 @@ router.post('/info', async (req, res) => {
         return res.status(400).json({ error: 'La URL es requerida.' });
     }
 
-    const maxRetries = 5; // Número máximo de reintentos
+    const maxRetries = 3; // Número máximo de reintentos
     let attempt = 0;
     const usedProxies = []; // Lista de proxies ya utilizados
 
