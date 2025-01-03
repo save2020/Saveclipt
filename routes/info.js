@@ -5,8 +5,7 @@ const path = require('path');
 
 const router = express.Router();
 
-// Cargar proxies desde un archivo
-const proxies = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies_download.json'), 'utf-8'));
+const proxies = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies_info.json'), 'utf-8'));
 
 // Función para seleccionar un proxy aleatorio y excluir los fallidos
 function getRandomProxy(usedProxies) {
@@ -20,6 +19,7 @@ function getRandomProxy(usedProxies) {
     }
     return `${proxy.ip}:${proxy.port}`;
 }
+
 
 // Objeto para rastrear el progreso por solicitud
 const progressTracker = {};
