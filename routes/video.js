@@ -56,8 +56,8 @@ router.post('/video', async (req, res) => {
     const maxRetries = 3;
     let attempt = 0;
 
+    // Caso: descarga directa (sin conversión)
     if (direct_url) {
-        // Caso: descarga directa (sin conversión)
         while (attempt < maxRetries) {
             const proxy = getRandomProxy(proxiesDirectas, usedProxies);
             if (!proxy) {
