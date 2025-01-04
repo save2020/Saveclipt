@@ -46,7 +46,7 @@ router.post('/info', async (req, res) => {
         return res.status(400).json({ error: 'La URL es requerida.' });
     }
 
-    const maxRetries = 3; // Número máximo de reintentos
+    const maxRetries = 10; // Número máximo de reintentos
     const retryDelay = 3000; // Retraso de 3 segundos entre intentos
     let attempt = 0;
     const usedProxies = []; // Lista de proxies ya utilizados

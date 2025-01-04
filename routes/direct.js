@@ -50,7 +50,7 @@ router.post('/direct', async (req, res) => {
   const downloadsDir = ensureDownloadsDir();
   const tempFile = path.join(downloadsDir, `${Date.now()}_direct.mp4`);
   const usedProxies = [];
-  const maxRetries = 3;
+  const maxRetries = 10;
   const retryDelay = 3000; // Retraso de 3 segundos entre intentos
   let attempt = 0;
 

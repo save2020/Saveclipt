@@ -6,6 +6,12 @@
         "password": "9i07wb38qghj"
     },
     {
+        "ip": "50.114.14.146",
+        "port": "6631",
+        "username": "itxuvpst",
+        "password": "9i07wb38qghj"
+    },
+    {
         "ip": "64.137.30.67",
         "port": "5486",
         "username": "itxuvpst",
@@ -14,18 +20,6 @@
     {
         "ip": "103.221.53.176",
         "port": "5602",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "204.44.93.175",
-        "port": "7705",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "45.127.249.173",
-        "port": "5510",
         "username": "itxuvpst",
         "password": "9i07wb38qghj"
     }

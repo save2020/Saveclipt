@@ -61,7 +61,7 @@ router.post('/audio', async (req, res) => {
     // Asegurar que el directorio `downloads` exista
     const downloadsDir = ensureDownloadsDir();
     const tempFile = path.join(downloadsDir, `${Date.now()}.mp3`);
-    const maxRetries = 5; // Número máximo de reintentos
+    const maxRetries = 10; // Número máximo de reintentos
     const retryDelay = 3000; // Retraso entre intentos en milisegundos (3 segundos)
     let attempt = 0;
     const usedProxies = []; // Proxies que ya fallaron
