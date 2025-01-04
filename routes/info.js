@@ -21,6 +21,10 @@ function getRandomProxy(usedProxies) {
     return `${proxy.ip}:${proxy.port}`;
 }
 
+// Función para agregar retrasos
+function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 // Objeto para rastrear el progreso por solicitud
 const progressTracker = {};
@@ -43,6 +47,7 @@ router.post('/info', async (req, res) => {
     }
 
     const maxRetries = 3; // Número máximo de reintentos
+    const retryDelay = 3000; // Retraso de 3 segundos entre intentos
     let attempt = 0;
     const usedProxies = []; // Lista de proxies ya utilizados
 
@@ -63,11 +68,11 @@ router.post('/info', async (req, res) => {
                 }
             }, 500);
 
-           // Obtener información del video
-           const info = await youtubedl(url, {
-            dumpSingleJson: true,
-            proxy: `http://${proxy}`, // Usar el proxy seleccionado
-            cookies: cookiesPath, // Agregar cookies
+            // Obtener información del video
+            const info = await youtubedl(url, {
+                dumpSingleJson: true,
+                proxy: `http://${proxy}`, // Usar el proxy seleccionado
+                cookies: cookiesPath, // Agregar cookies
             });
 
             clearInterval(interval); // Detener el incremento del progreso
@@ -146,6 +151,8 @@ router.post('/info', async (req, res) => {
         } catch (error) {
             console.error(`Error al usar el proxy ${proxy}:`, error.message);
             attempt++;
+            console.log(`Esperando ${retryDelay / 1000} segundos antes del próximo intento...`);
+            await delay(retryDelay); // Agregar retraso antes de reintentar
         }
     }
 

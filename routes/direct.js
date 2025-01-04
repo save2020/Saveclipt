@@ -34,6 +34,11 @@ function ensureDownloadsDir() {
   return downloadsDir;
 }
 
+// Función para agregar retrasos
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // Ruta para descargas directas
 router.post('/direct', async (req, res) => {
   const { direct_url } = req.body;
@@ -46,6 +51,7 @@ router.post('/direct', async (req, res) => {
   const tempFile = path.join(downloadsDir, `${Date.now()}_direct.mp4`);
   const usedProxies = [];
   const maxRetries = 3;
+  const retryDelay = 3000; // Retraso de 3 segundos entre intentos
   let attempt = 0;
 
   while (attempt < maxRetries) {
@@ -75,6 +81,8 @@ router.post('/direct', async (req, res) => {
     } catch (error) {
       console.error(`Error con proxy directo ${proxy}: ${error.message}`);
       attempt++;
+      console.log(`Esperando ${retryDelay / 1000} segundos antes del próximo intento...`);
+      await delay(retryDelay); // Agregar retraso antes de reintentar
     }
   }
 

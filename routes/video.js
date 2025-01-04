@@ -46,6 +46,11 @@ function cleanUpFiles(...files) {
     });
 }
 
+// Función para agregar retrasos
+function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 // Endpoint para manejar la descarga de videos
 router.post('/video', async (req, res) => {
     const { url, format_id, direct_url } = req.body; // Incluye la URL directa para descargas sin conversión
@@ -57,6 +62,7 @@ router.post('/video', async (req, res) => {
     const downloadsDir = ensureDownloadsDir();
     const usedProxies = [];
     const maxRetries = 3;
+    const retryDelay = 3000; // Retraso de 3 segundos entre intentos
     let attempt = 0;
 
     // Caso: descarga directa (sin conversión)
@@ -91,6 +97,8 @@ router.post('/video', async (req, res) => {
             } catch (error) {
                 console.error(`Error con proxy directo ${proxy}: ${error.message}`);
                 attempt++;
+                console.log(`Esperando ${retryDelay / 1000} segundos antes del próximo intento...`);
+                await delay(retryDelay); // Agregar retraso antes de reintentar
             }
         }
 
@@ -112,7 +120,6 @@ router.post('/video', async (req, res) => {
         console.log(`Usando proxy para conversión: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
 
         try {
-            // Descargar el video
             console.log(`Iniciando descarga del video en el formato ${format_id} desde: ${url}`);
             await youtubedl(url, {
                 format: format_id,
@@ -121,7 +128,6 @@ router.post('/video', async (req, res) => {
                 cookies: cookiesPath, // Usar cookies
             });
 
-            // Descargar el mejor audio disponible
             console.log('Iniciando descarga del audio...');
             await youtubedl(url, {
                 format: 'bestaudio',
@@ -130,12 +136,10 @@ router.post('/video', async (req, res) => {
                 cookies: cookiesPath, // Usar cookies
             });
 
-            // Validar si los archivos existen antes de combinar
             if (!fs.existsSync(videoFile) || !fs.existsSync(audioFile)) {
                 throw new Error('Archivos de video o audio faltantes después de la descarga.');
             }
 
-            // Combinar video y audio usando FFmpeg
             console.log('Iniciando combinación de video y audio...');
             const ffmpeg = spawn('ffmpeg', [
                 '-i', videoFile,
@@ -163,15 +167,16 @@ router.post('/video', async (req, res) => {
                 }
             });
 
-            return; // Salir del ciclo si todo se completó correctamente
+            return;
         } catch (error) {
             console.error(`Error con proxy de conversión ${proxy}: ${error.message}`);
             attempt++;
+            console.log(`Esperando ${retryDelay / 1000} segundos antes del próximo intento...`);
+            await delay(retryDelay); // Agregar retraso antes de reintentar
             cleanUpFiles(videoFile, audioFile, outputFile);
         }
     }
 
-    // Si falla la conversión
     cleanUpFiles(videoFile, audioFile, outputFile);
     res.status(500).json({ error: 'No se pudo procesar el video después de varios intentos.' });
 });

@@ -45,6 +45,11 @@ function cleanUpFile(filePath) {
     }
 }
 
+// Función para agregar retrasos
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // Endpoint para manejar la extracción de audio
 router.post('/audio', async (req, res) => {
     const { url } = req.body;
@@ -57,6 +62,7 @@ router.post('/audio', async (req, res) => {
     const downloadsDir = ensureDownloadsDir();
     const tempFile = path.join(downloadsDir, `${Date.now()}.mp3`);
     const maxRetries = 5; // Número máximo de reintentos
+    const retryDelay = 3000; // Retraso entre intentos en milisegundos (3 segundos)
     let attempt = 0;
     const usedProxies = []; // Proxies que ya fallaron
 
@@ -103,6 +109,8 @@ router.post('/audio', async (req, res) => {
         } catch (error) {
             console.error(`Error al usar el proxy ${proxy}: ${error.message}`);
             attempt++; // Incrementar intentos en caso de fallo
+            console.log(`Esperando ${retryDelay / 1000} segundos antes del próximo intento...`);
+            await delay(retryDelay); // Agregar retraso antes de reintentar
         }
     }
 
