@@ -30,6 +30,7 @@ function getRandomUserAgent() {
 // Función para seleccionar un proxy disponible
 function getRandomProxy(proxies, usedProxies) {
     const now = Date.now();
+    // Filtrar proxies disponibles
     const availableProxies = proxies.filter((proxy) => {
         const isBlocked = blockedProxies[proxy.ip] && now < blockedProxies[proxy.ip];
         return !usedProxies.includes(proxy.ip) && !isBlocked;
@@ -75,7 +76,7 @@ router.post('/direct', async (req, res) => {
     const timeoutLimit = 60000; // Timeout de 1 minuto
     const blockDuration = 15 * 60 * 1000; // Bloqueo temporal de 15 minutos
     let attempt = 0;
-    const usedProxies = [];
+    const usedProxies = []; // Lista para rastrear proxies ya usados
 
     while (attempt < maxRetries) {
         const proxy = getRandomProxy(proxiesDirectas, usedProxies);
@@ -83,7 +84,11 @@ router.post('/direct', async (req, res) => {
             console.error('No hay más proxies disponibles para descargas directas.');
             break;
         }
-        usedProxies.push(proxy);
+
+        // Extraer la IP del proxy y agregarla a los usados
+        const proxyIP = proxy.split('@')[1]?.split(':')[0] || proxy.split(':')[0];
+        usedProxies.push(proxyIP);
+
         console.log(`Usando proxy directo: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
 
         try {
@@ -100,22 +105,25 @@ router.post('/direct', async (req, res) => {
                 ),
             ]);
 
+            // Verificar si el archivo fue creado correctamente
             if (!fs.existsSync(tempFile)) {
                 throw new Error('El archivo no se creó correctamente.');
             }
 
+            console.log(`Descarga completada: ${tempFile}`);
             return res.download(tempFile, 'video_directo.mp4', () => {
                 fs.unlinkSync(tempFile);
-                console.log('Archivo directo eliminado.');
+                console.log('Archivo directo eliminado después de enviarlo al cliente.');
             });
         } catch (error) {
             console.error(`Error con proxy directo ${proxy}: ${error.message}`);
+            // Bloquear el proxy si falló por timeout
             if (error.message.includes('Timeout')) {
-                blockedProxies[proxy.split('@')[1].split(':')[0]] = Date.now() + blockDuration;
+                blockedProxies[proxyIP] = Date.now() + blockDuration;
             }
             attempt++;
             console.log(`Esperando ${retryDelay / 1000} segundos antes del próximo intento...`);
-            await delay(retryDelay);
+            await delay(retryDelay); // Agregar retraso antes de reintentar
         }
     }
 
