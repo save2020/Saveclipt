@@ -8,6 +8,9 @@ const router = express.Router();
 // Cargar proxies para descargas directas
 const proxiesDirectas = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxis_directas.json'), 'utf-8'));
 
+// Ruta del archivo de cookies
+const cookiesPath = path.join(__dirname, '../cookies.txt');
+
 // Función para seleccionar un proxy aleatorio
 function getRandomProxy(proxies, usedProxies) {
   const availableProxies = proxies.filter((proxy) => !usedProxies.includes(proxy.ip));
@@ -58,6 +61,7 @@ router.post('/direct', async (req, res) => {
       await youtubedl(direct_url, {
         output: tempFile,
         proxy: `http://${proxy}`,
+        cookies: cookiesPath, // Agregar las cookies
       });
 
       if (!fs.existsSync(tempFile)) {

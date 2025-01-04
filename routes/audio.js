@@ -8,6 +8,9 @@ const router = express.Router();
 // Cargar proxies desde un archivo
 const proxies = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies_download.json'), 'utf-8'));
 
+// Ruta del archivo de cookies
+const cookiesPath = path.join(__dirname, '../cookies.txt');
+
 // Función para seleccionar un proxy aleatorio y excluir los fallidos
 function getRandomProxy(usedProxies) {
     const availableProxies = proxies.filter(proxy => !usedProxies.includes(proxy.ip));
@@ -69,13 +72,14 @@ router.post('/audio', async (req, res) => {
         try {
             console.log(`Iniciando extracción de audio desde: ${url}...`);
 
-            // Descargar audio utilizando el proxy
+            // Descargar audio utilizando el proxy y las cookies
             await youtubedl(url, {
                 format: 'bestaudio',   // Descargar solo el audio
                 extractAudio: true,    // Extraer únicamente el audio
                 audioFormat: 'mp3',    // Convertir directamente a MP3
                 output: tempFile,      // Archivo de salida
-                proxy: `http://${proxy}` // Usar el proxy
+                proxy: `http://${proxy}`, // Usar el proxy
+                cookies: cookiesPath   // Usar cookies
             });
 
             console.log(`Audio descargado y convertido a MP3: ${tempFile}`);

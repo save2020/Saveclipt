@@ -10,6 +10,9 @@ const router = express.Router();
 const proxiesDirectas = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxis_directas.json'), 'utf-8'));
 const proxiesConversion = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies_download.json'), 'utf-8'));
 
+// Ruta del archivo de cookies
+const cookiesPath = path.join(__dirname, '../cookies.txt');
+
 // Función para seleccionar un proxy aleatorio
 function getRandomProxy(proxies, usedProxies) {
     const availableProxies = proxies.filter((proxy) => !usedProxies.includes(proxy.ip));
@@ -74,6 +77,7 @@ router.post('/video', async (req, res) => {
                 await youtubedl(direct_url, {
                     output: tempFile,
                     proxy: `http://${proxy}`,
+                    cookies: cookiesPath, // Usar cookies
                 });
 
                 if (!fs.existsSync(tempFile)) {
@@ -114,6 +118,7 @@ router.post('/video', async (req, res) => {
                 format: format_id,
                 output: videoFile,
                 proxy: `http://${proxy}`,
+                cookies: cookiesPath, // Usar cookies
             });
 
             // Descargar el mejor audio disponible
@@ -122,6 +127,7 @@ router.post('/video', async (req, res) => {
                 format: 'bestaudio',
                 output: audioFile,
                 proxy: `http://${proxy}`,
+                cookies: cookiesPath, // Usar cookies
             });
 
             // Validar si los archivos existen antes de combinar

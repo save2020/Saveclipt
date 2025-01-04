@@ -6,6 +6,7 @@ const path = require('path');
 const router = express.Router();
 
 const proxies = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies_info.json'), 'utf-8'));
+const cookiesPath = path.join(__dirname, '../cookies.txt');
 
 // Función para seleccionar un proxy aleatorio y excluir los fallidos
 function getRandomProxy(usedProxies) {
@@ -62,10 +63,11 @@ router.post('/info', async (req, res) => {
                 }
             }, 500);
 
-            // Obtener información del video
-            const info = await youtubedl(url, {
-                dumpSingleJson: true,
-                proxy: `http://${proxy}`, // Usar el proxy seleccionado
+           // Obtener información del video
+           const info = await youtubedl(url, {
+            dumpSingleJson: true,
+            proxy: `http://${proxy}`, // Usar el proxy seleccionado
+            cookies: cookiesPath, // Agregar cookies
             });
 
             clearInterval(interval); // Detener el incremento del progreso
