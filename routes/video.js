@@ -13,9 +13,30 @@ const proxiesConversion = JSON.parse(fs.readFileSync(path.join(__dirname, '../pr
 // Ruta del archivo de cookies
 const cookiesPath = path.join(__dirname, '../cookies.txt');
 
-// Función para seleccionar un proxy aleatorio
+// Objeto para rastrear proxies bloqueados temporalmente
+const blockedProxies = {};
+
+// Lista de User-Agents
+const userAgents = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+];
+
+// Función para obtener un User-Agent aleatorio
+function getRandomUserAgent() {
+    return userAgents[Math.floor(Math.random() * userAgents.length)];
+}
+
+// Función para seleccionar un proxy disponible
 function getRandomProxy(proxies, usedProxies) {
-    const availableProxies = proxies.filter((proxy) => !usedProxies.includes(proxy.ip));
+    const now = Date.now();
+    const availableProxies = proxies.filter((proxy) => {
+        const isBlocked = blockedProxies[proxy.ip] && now < blockedProxies[proxy.ip];
+        return !usedProxies.includes(proxy.ip) && !isBlocked;
+    });
+
     if (availableProxies.length === 0) return null; // No hay más proxies disponibles
     const randomIndex = Math.floor(Math.random() * availableProxies.length);
     const proxy = availableProxies[randomIndex];
@@ -60,10 +81,26 @@ router.post('/video', async (req, res) => {
     }
 
     const downloadsDir = ensureDownloadsDir();
-    const usedProxies = [];
     const maxRetries = 10;
     const retryDelay = 3000; // Retraso de 3 segundos entre intentos
+    const timeoutLimit = 60000; // Timeout de 1 minuto
+    const blockDuration = 15 * 60 * 1000; // 15 minutos de bloqueo para proxies fallidos
     let attempt = 0;
+    const usedProxies = [];
+
+    const downloadWithProxy = async (proxy, downloadUrl, outputPath) => {
+        return Promise.race([
+            youtubedl(downloadUrl, {
+                output: outputPath,
+                proxy: `http://${proxy}`,
+                cookies: cookiesPath,
+                userAgent: getRandomUserAgent(),
+            }),
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Timeout: El proxy tardó más de 1 minuto')), timeoutLimit)
+            ),
+        ]);
+    };
 
     // Caso: descarga directa (sin conversión)
     if (direct_url) {
@@ -77,18 +114,8 @@ router.post('/video', async (req, res) => {
             console.log(`Usando proxy directo: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
 
             try {
-                console.log(`Descargando directamente desde: ${direct_url}`);
                 const tempFile = path.join(downloadsDir, `${Date.now()}_direct.mp4`);
-
-                await youtubedl(direct_url, {
-                    output: tempFile,
-                    proxy: `http://${proxy}`,
-                    cookies: cookiesPath, // Usar cookies
-                });
-
-                if (!fs.existsSync(tempFile)) {
-                    throw new Error('El archivo no se creó correctamente.');
-                }
+                await downloadWithProxy(proxy, direct_url, tempFile);
 
                 return res.download(tempFile, 'video_directo.mp4', () => {
                     fs.unlinkSync(tempFile);
@@ -96,9 +123,12 @@ router.post('/video', async (req, res) => {
                 });
             } catch (error) {
                 console.error(`Error con proxy directo ${proxy}: ${error.message}`);
+                if (error.message.includes('Timeout')) {
+                    blockedProxies[proxy.split('@')[1].split(':')[0]] = Date.now() + blockDuration;
+                }
                 attempt++;
                 console.log(`Esperando ${retryDelay / 1000} segundos antes del próximo intento...`);
-                await delay(retryDelay); // Agregar retraso antes de reintentar
+                await delay(retryDelay);
             }
         }
 
@@ -120,27 +150,13 @@ router.post('/video', async (req, res) => {
         console.log(`Usando proxy para conversión: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
 
         try {
-            console.log(`Iniciando descarga del video en el formato ${format_id} desde: ${url}`);
-            await youtubedl(url, {
-                format: format_id,
-                output: videoFile,
-                proxy: `http://${proxy}`,
-                cookies: cookiesPath, // Usar cookies
-            });
-
-            console.log('Iniciando descarga del audio...');
-            await youtubedl(url, {
-                format: 'bestaudio',
-                output: audioFile,
-                proxy: `http://${proxy}`,
-                cookies: cookiesPath, // Usar cookies
-            });
+            await downloadWithProxy(proxy, url, videoFile);
+            await downloadWithProxy(proxy, url, audioFile);
 
             if (!fs.existsSync(videoFile) || !fs.existsSync(audioFile)) {
                 throw new Error('Archivos de video o audio faltantes después de la descarga.');
             }
 
-            console.log('Iniciando combinación de video y audio...');
             const ffmpeg = spawn('ffmpeg', [
                 '-i', videoFile,
                 '-i', audioFile,
@@ -170,9 +186,12 @@ router.post('/video', async (req, res) => {
             return;
         } catch (error) {
             console.error(`Error con proxy de conversión ${proxy}: ${error.message}`);
+            if (error.message.includes('Timeout')) {
+                blockedProxies[proxy.split('@')[1].split(':')[0]] = Date.now() + blockDuration;
+            }
             attempt++;
             console.log(`Esperando ${retryDelay / 1000} segundos antes del próximo intento...`);
-            await delay(retryDelay); // Agregar retraso antes de reintentar
+            await delay(retryDelay);
             cleanUpFiles(videoFile, audioFile, outputFile);
         }
     }

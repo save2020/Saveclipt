@@ -8,9 +8,30 @@ const router = express.Router();
 const proxies = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies_info.json'), 'utf-8'));
 const cookiesPath = path.join(__dirname, '../cookies.txt');
 
-// Función para seleccionar un proxy aleatorio y excluir los fallidos
+// Objeto para rastrear proxies temporalmente bloqueados
+const blockedProxies = {};
+
+// Lista de User-Agents
+const userAgents = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+];
+
+// Función para obtener un User-Agent aleatorio
+function getRandomUserAgent() {
+    return userAgents[Math.floor(Math.random() * userAgents.length)];
+}
+
+// Función para seleccionar un proxy disponible
 function getRandomProxy(usedProxies) {
-    const availableProxies = proxies.filter((proxy) => !usedProxies.includes(proxy.ip));
+    const now = Date.now();
+    const availableProxies = proxies.filter((proxy) => {
+        const isBlocked = blockedProxies[proxy.ip] && now < blockedProxies[proxy.ip];
+        return !usedProxies.includes(proxy.ip) && !isBlocked;
+    });
+
     if (availableProxies.length === 0) return null; // No hay más proxies disponibles
     const randomIndex = Math.floor(Math.random() * availableProxies.length);
     const proxy = availableProxies[randomIndex];
@@ -46,8 +67,10 @@ router.post('/info', async (req, res) => {
         return res.status(400).json({ error: 'La URL es requerida.' });
     }
 
-    const maxRetries = 10; // Número máximo de reintentos
+    const maxRetries = proxies.length; // Número máximo de intentos igual al número de proxies
     const retryDelay = 3000; // Retraso de 3 segundos entre intentos
+    const timeoutLimit = 60000; // 1 minuto de límite para la solicitud
+    const blockDuration = 15 * 60 * 1000; // 15 minutos de bloqueo para proxies lentos
     let attempt = 0;
     const usedProxies = []; // Lista de proxies ya utilizados
 
@@ -68,12 +91,18 @@ router.post('/info', async (req, res) => {
                 }
             }, 500);
 
-            // Obtener información del video
-            const info = await youtubedl(url, {
-                dumpSingleJson: true,
-                proxy: `http://${proxy}`, // Usar el proxy seleccionado
-                cookies: cookiesPath, // Agregar cookies
-            });
+            // Obtener información del video con timeout
+            const info = await Promise.race([
+                youtubedl(url, {
+                    dumpSingleJson: true,
+                    proxy: `http://${proxy}`,
+                    cookies: cookiesPath,
+                    userAgent: getRandomUserAgent(), // User-Agent aleatorio
+                }),
+                new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Timeout: El proxy tardó más de 1 minuto')), timeoutLimit)
+                ),
+            ]);
 
             clearInterval(interval); // Detener el incremento del progreso
             progressTracker[requestId] = 100; // Marcar progreso como completo
@@ -81,7 +110,7 @@ router.post('/info', async (req, res) => {
             // Filtrar formatos deseados
             const desiredQualities = [360, 720, 1080];
             const formats = info.formats
-                .filter((f) => f.ext === 'mp4' && desiredQualities.includes(f.height)) // Solo MP4 y calidades deseadas
+                .filter((f) => f.ext === 'mp4' && desiredQualities.includes(f.height))
                 .map((f) => ({
                     quality: `${f.height}p`,
                     format_id: f.format_id,
@@ -149,7 +178,13 @@ router.post('/info', async (req, res) => {
                 },
             });
         } catch (error) {
-            console.error(`Error al usar el proxy ${proxy}:`, error.message);
+            clearInterval(interval); // Detener el progreso en caso de error
+            if (error.message.includes('Timeout')) {
+                console.error(`El proxy ${proxy} excedió el límite de tiempo y será bloqueado por 15 minutos.`);
+                blockedProxies[proxy.split('@')[1].split(':')[0]] = Date.now() + blockDuration;
+            } else {
+                console.error(`Error con el proxy ${proxy}:`, error.message);
+            }
             attempt++;
             console.log(`Esperando ${retryDelay / 1000} segundos antes del próximo intento...`);
             await delay(retryDelay); // Agregar retraso antes de reintentar
