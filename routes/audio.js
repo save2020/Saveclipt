@@ -95,7 +95,11 @@ router.post('/audio', async (req, res) => {
             console.error('No hay más proxies disponibles para intentar.');
             break;
         }
-        usedProxies.push(proxy);
+
+        // Registrar proxy como usado
+        const proxyIP = proxy.split('@')[1]?.split(':')[0] || proxy.split(':')[0];
+        usedProxies.push(proxyIP);
+
         console.log(`Usando proxy: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
 
         try {
@@ -138,7 +142,7 @@ router.post('/audio', async (req, res) => {
         } catch (error) {
             console.error(`Error al usar el proxy ${proxy}: ${error.message}`);
             if (error.message.includes('Timeout')) {
-                blockedProxies[proxy.split('@')[1].split(':')[0]] = Date.now() + blockDuration;
+                blockedProxies[proxyIP] = Date.now() + blockDuration;
             }
             attempt++; // Incrementar intentos en caso de fallo
             console.log(`Esperando ${retryDelay / 1000} segundos antes del próximo intento...`);

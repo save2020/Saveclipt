@@ -13,7 +13,6 @@ let videoUrl = '';
 const langPath = window.location.pathname.split('/')[1]; // Detectar idioma (es, en, chino, etc.)
 const apiBaseUrl = `/${langPath}/api`; // Base URL dinámica para las rutas de la API
 
-// Configuración de traducciones
 const translations = {
   es: {
     fetchingInfo: "Obteniendo información del video...",
@@ -23,7 +22,7 @@ const translations = {
     startingQuickDownload: "Iniciando descarga rápida...",
     startingAudioExtraction: "Iniciando extracción de audio...",
     downloadCompleted: "¡Descarga completada!",
-    errorDuringDownload: "Error al iniciar la descarga.",
+    errorDuringDownload: "Los servidores están sobrecargados. Por favor, inténtalo nuevamente en 15 minutos.",
     noConversion: "sin conversión",
     requiresConversion: "requiere conversión"
   },
@@ -35,7 +34,7 @@ const translations = {
     startingQuickDownload: "Starting quick download...",
     startingAudioExtraction: "Starting audio extraction...",
     downloadCompleted: "Download completed!",
-    errorDuringDownload: "Error starting the download.",
+    errorDuringDownload: "The servers are overloaded. Please try again in 15 minutes.",
     noConversion: "no conversion",
     requiresConversion: "requires conversion"
   },
@@ -47,11 +46,12 @@ const translations = {
     startingQuickDownload: "开始快速下载...",
     startingAudioExtraction: "开始提取音频...",
     downloadCompleted: "下载完成！",
-    errorDuringDownload: "开始下载时出错。",
+    errorDuringDownload: "服务器过载。请在15分钟后重试。",
     noConversion: "无需转换",
     requiresConversion: "需要转换"
   }
 };
+
 
 // Función para traducir mensajes
 function t(key) {

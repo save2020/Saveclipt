@@ -80,7 +80,11 @@ router.post('/info', async (req, res) => {
             console.error('No hay más proxies disponibles para intentar.');
             break;
         }
-        usedProxies.push(proxy);
+
+        // Agregar proxy a la lista de usados
+        const proxyIP = proxy.split('@')[1]?.split(':')[0] || proxy.split(':')[0];
+        usedProxies.push(proxyIP);
+
         console.log(`Usando proxy: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
 
         try {
@@ -181,7 +185,7 @@ router.post('/info', async (req, res) => {
             clearInterval(interval); // Detener el progreso en caso de error
             if (error.message.includes('Timeout')) {
                 console.error(`El proxy ${proxy} excedió el límite de tiempo y será bloqueado por 15 minutos.`);
-                blockedProxies[proxy.split('@')[1].split(':')[0]] = Date.now() + blockDuration;
+                blockedProxies[proxyIP] = Date.now() + blockDuration;
             } else {
                 console.error(`Error con el proxy ${proxy}:`, error.message);
             }
