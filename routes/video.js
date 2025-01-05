@@ -74,7 +74,7 @@ function delay(ms) {
 
 // Función genérica para descargar con proxy y timeout
 async function downloadWithProxy(proxy, downloadUrl, outputPath) {
-    const timeoutLimit = 60000; // Timeout de 1 minuto
+    const timeoutLimit = 300000; // Timeout de 5 minutos
     return Promise.race([
         youtubedl(downloadUrl, {
             output: outputPath,
