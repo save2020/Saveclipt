@@ -1,0 +1,15 @@
+# Bloqueo de rutas específicas para no ser indexadas
+User-agent: *
+Disallow: /en/enprivacy-policy.html
+Disallow: /en/enterms-and-conditions.html
+Disallow: /es/espoliticas-de-privacidad.html
+Disallow: /es/esterminos-y-condiciones.html
+Disallow: /chino/chinopriva.html
+Disallow: /chino/chinoter.html
+
+# Sitemaps específicos por idioma
+Sitemap: https://saveclipt.com/sitemapes.xml
+Sitemap: https://saveclipt.com/sitemapchino.xml
+Sitemap: https://saveclipt.com/sitemapen.xml
+
+
