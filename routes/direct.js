@@ -11,9 +11,6 @@ const proxiesDirectas = JSON.parse(fs.readFileSync(path.join(__dirname, '../prox
 // Ruta del archivo de cookies
 const cookiesPath = path.join(__dirname, '../cookies.txt');
 
-// Objeto para rastrear proxies bloqueados temporalmente
-const blockedProxies = {};
-
 // Lista de User-Agents
 const userAgents = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
@@ -29,12 +26,7 @@ function getRandomUserAgent() {
 
 // Función para seleccionar un proxy disponible
 function getRandomProxy(proxies, usedProxies) {
-    const now = Date.now();
-    // Filtrar proxies disponibles
-    const availableProxies = proxies.filter((proxy) => {
-        const isBlocked = blockedProxies[proxy.ip] && now < blockedProxies[proxy.ip];
-        return !usedProxies.includes(proxy.ip) && !isBlocked;
-    });
+    const availableProxies = proxies.filter((proxy) => !usedProxies.includes(proxy.ip));
 
     if (availableProxies.length === 0) return null; // No hay más proxies disponibles
     const randomIndex = Math.floor(Math.random() * availableProxies.length);
@@ -73,8 +65,6 @@ router.post('/direct', async (req, res) => {
     const tempFile = path.join(downloadsDir, `${Date.now()}_direct.mp4`);
     const maxRetries = proxiesDirectas.length; // Número máximo de intentos igual al número de proxies
     const retryDelay = 3000; // Retraso de 3 segundos entre intentos
-    const timeoutLimit = 60000; // Timeout de 1 minuto
-    const blockDuration = 15 * 60 * 1000; // Bloqueo temporal de 15 minutos
     let attempt = 0;
     const usedProxies = []; // Lista para rastrear proxies ya usados
 
@@ -92,18 +82,13 @@ router.post('/direct', async (req, res) => {
         console.log(`Usando proxy directo: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
 
         try {
-            // Descargar con proxy y timeout
-            await Promise.race([
-                youtubedl(direct_url, {
-                    output: tempFile,
-                    proxy: `http://${proxy}`,
-                    cookies: cookiesPath,
-                    userAgent: getRandomUserAgent(),
-                }),
-                new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Timeout: El proxy tardó más de 1 minuto')), timeoutLimit)
-                ),
-            ]);
+            // Descargar con proxy
+            await youtubedl(direct_url, {
+                output: tempFile,
+                proxy: `http://${proxy}`,
+                cookies: cookiesPath,
+                userAgent: getRandomUserAgent(),
+            });
 
             // Verificar si el archivo fue creado correctamente
             if (!fs.existsSync(tempFile)) {
@@ -117,10 +102,6 @@ router.post('/direct', async (req, res) => {
             });
         } catch (error) {
             console.error(`Error con proxy directo ${proxy}: ${error.message}`);
-            // Bloquear el proxy si falló por timeout
-            if (error.message.includes('Timeout')) {
-                blockedProxies[proxyIP] = Date.now() + blockDuration;
-            }
             attempt++;
             console.log(`Esperando ${retryDelay / 1000} segundos antes del próximo intento...`);
             await delay(retryDelay); // Agregar retraso antes de reintentar

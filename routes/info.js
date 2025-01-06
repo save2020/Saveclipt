@@ -8,9 +8,6 @@ const router = express.Router();
 const proxies = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies_info.json'), 'utf-8'));
 const cookiesPath = path.join(__dirname, '../cookies.txt');
 
-// Objeto para rastrear proxies temporalmente bloqueados
-const blockedProxies = {};
-
 // Lista de User-Agents
 const userAgents = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
@@ -26,11 +23,7 @@ function getRandomUserAgent() {
 
 // Función para seleccionar un proxy disponible
 function getRandomProxy(usedProxies) {
-    const now = Date.now();
-    const availableProxies = proxies.filter((proxy) => {
-        const isBlocked = blockedProxies[proxy.ip] && now < blockedProxies[proxy.ip];
-        return !usedProxies.includes(proxy.ip) && !isBlocked;
-    });
+    const availableProxies = proxies.filter((proxy) => !usedProxies.includes(proxy.ip));
 
     if (availableProxies.length === 0) return null; // No hay más proxies disponibles
     const randomIndex = Math.floor(Math.random() * availableProxies.length);
@@ -69,8 +62,6 @@ router.post('/info', async (req, res) => {
 
     const maxRetries = proxies.length; // Número máximo de intentos igual al número de proxies
     const retryDelay = 3000; // Retraso de 3 segundos entre intentos
-    const timeoutLimit = 60000; // 1 minuto de límite para la solicitud
-    const blockDuration = 15 * 60 * 1000; // 15 minutos de bloqueo para proxies lentos
     let attempt = 0;
     const usedProxies = []; // Lista de proxies ya utilizados
 
@@ -95,18 +86,13 @@ router.post('/info', async (req, res) => {
                 }
             }, 500);
 
-            // Obtener información del video con timeout
-            const info = await Promise.race([
-                youtubedl(url, {
-                    dumpSingleJson: true,
-                    proxy: `http://${proxy}`,
-                    cookies: cookiesPath,
-                    userAgent: getRandomUserAgent(), // User-Agent aleatorio
-                }),
-                new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Timeout: El proxy tardó más de 1 minuto')), timeoutLimit)
-                ),
-            ]);
+            // Obtener información del video
+            const info = await youtubedl(url, {
+                dumpSingleJson: true,
+                proxy: `http://${proxy}`,
+                cookies: cookiesPath,
+                userAgent: getRandomUserAgent(), // User-Agent aleatorio
+            });
 
             clearInterval(interval); // Detener el incremento del progreso
             progressTracker[requestId] = 100; // Marcar progreso como completo
@@ -141,13 +127,11 @@ router.post('/info', async (req, res) => {
 
             if (durationInMinutes > 50) {
                 if (groupNoMerge.length === 0) {
-                    clearInterval(interval); // Detener el intervalo
                     delete progressTracker[requestId]; // Limpiar progreso
                     return res.status(400).json({
                         error: 'No hay formatos disponibles con audio y video para este video.',
                     });
                 }
-                clearInterval(interval); // Detener el intervalo si hay éxito
                 delete progressTracker[requestId]; // Limpiar progreso
                 return res.json({
                     title: info.title,
@@ -170,7 +154,6 @@ router.post('/info', async (req, res) => {
             });
 
             // Enviar respuesta y detener el ciclo
-            clearInterval(interval); // Detener el intervalo si hay éxito
             delete progressTracker[requestId]; // Limpiar progreso
             return res.json({
                 title: info.title,
@@ -182,13 +165,7 @@ router.post('/info', async (req, res) => {
                 },
             });
         } catch (error) {
-            clearInterval(interval); // Detener el progreso en caso de error
-            if (error.message.includes('Timeout')) {
-                console.error(`El proxy ${proxy} excedió el límite de tiempo y será bloqueado por 15 minutos.`);
-                blockedProxies[proxyIP] = Date.now() + blockDuration;
-            } else {
-                console.error(`Error con el proxy ${proxy}:`, error.message);
-            }
+            console.error(`Error con el proxy ${proxy}:`, error.message);
             attempt++;
             console.log(`Esperando ${retryDelay / 1000} segundos antes del próximo intento...`);
             await delay(retryDelay); // Agregar retraso antes de reintentar
@@ -196,7 +173,6 @@ router.post('/info', async (req, res) => {
     }
 
     // Si todos los intentos fallan
-    progressTracker[requestId] = 0; // Reiniciar progreso en caso de error
     delete progressTracker[requestId]; // Eliminar progreso
     res.status(500).json({ error: 'No se pudo obtener la información del video después de varios intentos.' });
 });

@@ -7,11 +7,23 @@ const { spawn } = require('child_process');
 const router = express.Router();
 
 // Cargar proxies desde los archivos correspondientes
-const proxiesDirectas = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxis_directas.json'), 'utf-8'));
 const proxiesConversion = JSON.parse(fs.readFileSync(path.join(__dirname, '../proxies_download.json'), 'utf-8'));
 
 // Ruta del archivo de cookies
 const cookiesPath = path.join(__dirname, '../cookies.txt');
+
+// Lista de User-Agents
+const userAgents = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+];
+
+// Función para obtener un User-Agent aleatorio
+function getRandomUserAgent() {
+    return userAgents[Math.floor(Math.random() * userAgents.length)];
+}
 
 // Función para seleccionar un proxy aleatorio
 function getRandomProxy(proxies, usedProxies) {
@@ -53,9 +65,9 @@ function delay(ms) {
 
 // Endpoint para manejar la descarga de videos
 router.post('/video', async (req, res) => {
-    const { url, format_id, direct_url } = req.body; // Incluye la URL directa para descargas sin conversión
+    const { url, format_id } = req.body;
 
-    if (!url || (!format_id && !direct_url)) {
+    if (!url || !format_id) {
         return res.status(400).json({ error: 'La URL y el formato son requeridos.' });
     }
 
@@ -65,47 +77,6 @@ router.post('/video', async (req, res) => {
     const retryDelay = 3000; // Retraso de 3 segundos entre intentos
     let attempt = 0;
 
-    // Caso: descarga directa (sin conversión)
-    if (direct_url) {
-        while (attempt < maxRetries) {
-            const proxy = getRandomProxy(proxiesDirectas, usedProxies);
-            if (!proxy) {
-                console.error('No hay más proxies disponibles para descargas directas.');
-                break;
-            }
-            usedProxies.push(proxy);
-            console.log(`Usando proxy directo: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
-
-            try {
-                console.log(`Descargando directamente desde: ${direct_url}`);
-                const tempFile = path.join(downloadsDir, `${Date.now()}_direct.mp4`);
-
-                await youtubedl(direct_url, {
-                    output: tempFile,
-                    proxy: `http://${proxy}`,
-                    cookies: cookiesPath, // Usar cookies
-                });
-
-                if (!fs.existsSync(tempFile)) {
-                    throw new Error('El archivo no se creó correctamente.');
-                }
-
-                return res.download(tempFile, 'video_directo.mp4', () => {
-                    fs.unlinkSync(tempFile);
-                    console.log('Archivo directo eliminado.');
-                });
-            } catch (error) {
-                console.error(`Error con proxy directo ${proxy}: ${error.message}`);
-                attempt++;
-                console.log(`Esperando ${retryDelay / 1000} segundos antes del próximo intento...`);
-                await delay(retryDelay); // Agregar retraso antes de reintentar
-            }
-        }
-
-        return res.status(500).json({ error: 'Error al descargar el archivo directamente.' });
-    }
-
-    // Caso: requiere conversión
     const videoFile = path.join(downloadsDir, `${Date.now()}_video.mp4`);
     const audioFile = path.join(downloadsDir, `${Date.now()}_audio.mp4`);
     const outputFile = path.join(downloadsDir, `${Date.now()}_output.mp4`);
@@ -126,6 +97,7 @@ router.post('/video', async (req, res) => {
                 output: videoFile,
                 proxy: `http://${proxy}`,
                 cookies: cookiesPath, // Usar cookies
+                userAgent: getRandomUserAgent(), // User-Agent aleatorio
             });
 
             console.log('Iniciando descarga del audio...');
@@ -134,6 +106,7 @@ router.post('/video', async (req, res) => {
                 output: audioFile,
                 proxy: `http://${proxy}`,
                 cookies: cookiesPath, // Usar cookies
+                userAgent: getRandomUserAgent(), // User-Agent aleatorio
             });
 
             if (!fs.existsSync(videoFile) || !fs.existsSync(audioFile)) {
