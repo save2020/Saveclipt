@@ -95,7 +95,12 @@
   <div class="container">
     <main id="infoForm">
       <form>
-        <input type="url" id="videoUrl" placeholder="输入视频网址" required>
+        <input 
+        type="url" 
+        id="videoUrl" 
+        placeholder="Ingresa la URL del video" 
+        pattern="https?://(www\.)?(youtube\.com/watch\?v=|youtu\.be/)[\w-]+(&.*)?" 
+        required>
         <button type="submit">搜索视频</button>
       </form>
 
