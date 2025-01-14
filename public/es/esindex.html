@@ -127,7 +127,13 @@
   <div class="container">
     <main id="infoForm">
       <form>
-        <input type="url" id="videoUrl" placeholder="Ingresa la URL del video" pattern="https?://(www\.)?youtube\.com/.*" required>
+        <input 
+        type="url" 
+        id="videoUrl" 
+        placeholder="Ingresa la URL del video" 
+        pattern="https?://(www\.)?(youtube\.com/watch\?v=|youtu\.be/)[\w-]+(&.*)?" 
+        required>
+      
         <button type="submit" aria-label="Buscar video para descargar">Buscar Video</button>
       </form>
 
