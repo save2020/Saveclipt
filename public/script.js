@@ -1,4 +1,4 @@
-infoForm = document.getElementById('infoForm');
+const infoForm = document.getElementById('infoForm');
 const videoUrlInput = document.getElementById('videoUrl');
 const videoPreview = document.getElementById('videoPreview');
 const videoTitle = document.getElementById('videoTitle');
@@ -11,7 +11,7 @@ let videoUrl = '';
 
 // Obtener la raíz del idioma desde la URL
 const langPath = window.location.pathname.split('/')[1]; // Detectar idioma (es, en, chino, etc.)
-const apiBaseUrl = /${langPath}/api; // Base URL dinámica para las rutas de la API
+const apiBaseUrl = `/${langPath}/api`; // Base URL dinámica para las rutas de la API
 
 const translations = {
   es: {
@@ -51,7 +51,6 @@ const translations = {
     requiresConversion: "需要转换"
   }
 };
-
 
 // Función para traducir mensajes
 function t(key) {
@@ -94,7 +93,7 @@ infoForm.addEventListener('submit', async (e) => {
   startProcessing(t('fetchingInfo'));
 
   try {
-    const response = await fetch(${apiBaseUrl}/info, {
+    const response = await fetch(`${apiBaseUrl}/info`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url: videoUrl }),
@@ -121,7 +120,7 @@ infoForm.addEventListener('submit', async (e) => {
       data.formats.no_merge.forEach((format) => {
         const option = document.createElement('option');
         option.value = JSON.stringify(format);
-        option.textContent = ${format.quality} - ${format.filesize || 'Desconocido'} (${t('noConversion')});
+        option.textContent = `${format.quality} - ${format.filesize || 'Desconocido'} (${t('noConversion')})`;
         noMergeGroup.appendChild(option);
       });
       qualitySelect.appendChild(noMergeGroup);
@@ -133,7 +132,7 @@ infoForm.addEventListener('submit', async (e) => {
       data.formats.requires_merge.forEach((format) => {
         const option = document.createElement('option');
         option.value = JSON.stringify(format);
-        option.textContent = ${format.quality} - ${format.filesize || 'Desconocido'} (${t('requiresConversion')});
+        option.textContent = `${format.quality} - ${format.filesize || 'Desconocido'} (${t('requiresConversion')})`;
         requiresMergeGroup.appendChild(option);
       });
       qualitySelect.appendChild(requiresMergeGroup);
@@ -162,7 +161,7 @@ downloadButton.addEventListener('click', async () => {
       // Descarga con conversión
       startProcessing(t('startingVideoConversion'));
       try {
-        const response = await fetch(${apiBaseUrl}/video, {
+        const response = await fetch(`${apiBaseUrl}/video`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url: videoUrl, format_id: format.format_id }),
@@ -173,7 +172,7 @@ downloadButton.addEventListener('click', async () => {
         const blob = await response.blob();
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = ${videoTitle.textContent}.mp4;
+        link.download = `${videoTitle.textContent}.mp4`;
         link.click();
 
         stopProcessing(t('downloadCompleted'));
@@ -185,7 +184,7 @@ downloadButton.addEventListener('click', async () => {
       // Descarga directa (sin conversión)
       startProcessing(t('startingQuickDownload'));
       try {
-        const response = await fetch(${apiBaseUrl}/direct, {
+        const response = await fetch(`${apiBaseUrl}/direct`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ direct_url: format.url }),
@@ -196,7 +195,7 @@ downloadButton.addEventListener('click', async () => {
         const blob = await response.blob();
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = ${videoTitle.textContent}.mp4;
+        link.download = `${videoTitle.textContent}.mp4`;
         link.click();
 
         stopProcessing(t('downloadCompleted'));
@@ -209,7 +208,7 @@ downloadButton.addEventListener('click', async () => {
     // Descarga de solo audio
     startProcessing(t('startingAudioExtraction'));
     try {
-      const response = await fetch(${apiBaseUrl}/audio, {
+      const response = await fetch(`${apiBaseUrl}/audio`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: videoUrl }),
@@ -220,7 +219,7 @@ downloadButton.addEventListener('click', async () => {
       const blob = await response.blob();
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = ${videoTitle.textContent || 'audio'}.mp3;
+      link.download = `${videoTitle.textContent || 'audio'}.mp3`;
       link.click();
 
       stopProcessing(t('downloadCompleted'));
