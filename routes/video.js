@@ -81,39 +81,48 @@ router.post('/video', async (req, res) => {
     const audioFile = path.join(downloadsDir, `${Date.now()}_audio.mp4`);
     const outputFile = path.join(downloadsDir, `${Date.now()}_output.mp4`);
 
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    const sendMessage = (message) => {
+        res.write(`data: ${message}\n\n`);
+    };
+
     while (attempt < maxRetries) {
         const proxy = getRandomProxy(proxiesConversion, usedProxies);
         if (!proxy) {
-            console.error('No hay más proxies disponibles para la conversión.');
+            sendMessage('No hay más proxies disponibles para la conversión.');
             break;
         }
         usedProxies.push(proxy);
-        console.log(`Usando proxy para conversión: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
+        sendMessage(`Usando proxy para conversión: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
 
         try {
-            console.log(`Iniciando descarga del video en el formato ${format_id} desde: ${url}`);
+            sendMessage('Iniciando descarga del video...');
             await youtubedl(url, {
                 format: format_id,
                 output: videoFile,
                 proxy: `http://${proxy}`,
-                cookies: cookiesPath, // Usar cookies
-                userAgent: getRandomUserAgent(), // User-Agent aleatorio
+                cookies: cookiesPath,
+                userAgent: getRandomUserAgent(),
             });
 
-            console.log('Iniciando descarga del audio...');
+            sendMessage('Iniciando descarga del audio...');
             await youtubedl(url, {
                 format: 'bestaudio',
                 output: audioFile,
                 proxy: `http://${proxy}`,
-                cookies: cookiesPath, // Usar cookies
-                userAgent: getRandomUserAgent(), // User-Agent aleatorio
+                cookies: cookiesPath,
+                userAgent: getRandomUserAgent(),
             });
 
             if (!fs.existsSync(videoFile) || !fs.existsSync(audioFile)) {
                 throw new Error('Archivos de video o audio faltantes después de la descarga.');
             }
 
-            console.log('Iniciando combinación de video y audio...');
+            sendMessage('Iniciando combinación de video y audio...');
             const ffmpeg = spawn('ffmpeg', [
                 '-i', videoFile,
                 '-i', audioFile,
@@ -124,34 +133,35 @@ router.post('/video', async (req, res) => {
             ]);
 
             ffmpeg.stderr.on('data', (data) => {
-                console.error(`FFmpeg: ${data.toString()}`);
+                sendMessage(`FFmpeg: ${data.toString()}`);
             });
 
             ffmpeg.on('close', (code) => {
                 if (code === 0) {
-                    console.log(`Combinación completada: ${outputFile}`);
-                    res.download(outputFile, 'video_con_audio.mp4', () => {
-                        cleanUpFiles(videoFile, audioFile, outputFile);
-                    });
+                    sendMessage(`Combinación completada. Preparando descarga: ${outputFile}`);
+                    res.write('event: done\n');
+                    res.write(`data: ${outputFile}\n\n`);
+                    res.end();
+                    cleanUpFiles(videoFile, audioFile); // Opcional, elimina temporales después
                 } else {
-                    console.error(`FFmpeg cerró con código: ${code}`);
+                    sendMessage('Error al combinar el video y el audio.');
                     cleanUpFiles(videoFile, audioFile, outputFile);
-                    res.status(500).send('Error al combinar el video y el audio.');
+                    res.end();
                 }
             });
 
             return;
         } catch (error) {
-            console.error(`Error con proxy de conversión ${proxy}: ${error.message}`);
+            sendMessage(`Error: ${error.message}`);
             attempt++;
-            console.log(`Esperando ${retryDelay / 1000} segundos antes del próximo intento...`);
-            await delay(retryDelay); // Agregar retraso antes de reintentar
+            await delay(retryDelay);
             cleanUpFiles(videoFile, audioFile, outputFile);
         }
     }
 
-    cleanUpFiles(videoFile, audioFile, outputFile);
-    res.status(500).json({ error: 'No se pudo procesar el video después de varios intentos.' });
+    sendMessage('No se pudo procesar el video después de varios intentos.');
+    res.end();
 });
+
 
 module.exports = router;
