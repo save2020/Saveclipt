@@ -24,7 +24,8 @@ const translations = {
     downloadCompleted: "¡Descarga completada!",
     errorDuringDownload: "Los servidores están sobrecargados. Por favor, inténtalo nuevamente en 15 minutos.",
     noConversion: "sin conversión",
-    requiresConversion: "requiere conversión"
+    requiresConversion: "requiere conversión",
+    processing: "Procesando solicitud...",
   },
   en: {
     fetchingInfo: "Fetching video information...",
@@ -36,22 +37,10 @@ const translations = {
     downloadCompleted: "Download completed!",
     errorDuringDownload: "The servers are overloaded. Please try again in 15 minutes.",
     noConversion: "no conversion",
-    requiresConversion: "requires conversion"
+    requiresConversion: "requires conversion",
+    processing: "Processing request...",
   },
-  zh: {
-    fetchingInfo: "获取视频信息...",
-    errorFetchingInfo: "获取视频信息时出错。",
-    selectQuality: "下载前请选择质量。",
-    startingVideoConversion: "开始视频转换...",
-    startingQuickDownload: "开始快速下载...",
-    startingAudioExtraction: "开始提取音频...",
-    downloadCompleted: "下载完成！",
-    errorDuringDownload: "服务器过载。请在15分钟后重试。",
-    noConversion: "无需转换",
-    requiresConversion: "需要转换"
-  }
 };
-
 
 // Función para traducir mensajes
 function t(key) {
@@ -146,9 +135,8 @@ infoForm.addEventListener('submit', async (e) => {
 });
 
 // Manejo del evento para descargar el archivo seleccionado
-downloadButton.addEventListener('click', async () => {
+downloadButton.addEventListener('click', () => {
   const selectedOption = qualitySelect.value;
-  const type = document.querySelector('input[name="type"]:checked').value;
 
   if (!selectedOption) {
     stopProcessing(t('selectQuality'));
@@ -157,76 +145,28 @@ downloadButton.addEventListener('click', async () => {
 
   const format = JSON.parse(selectedOption);
 
-  if (type === 'video') {
-    if (format.requires_merge) {
-      // Descarga con conversión
-      startProcessing(t('startingVideoConversion'));
-      try {
-        const response = await fetch(`${apiBaseUrl}/video`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: videoUrl, format_id: format.format_id }),
-        });
+  startProcessing(t('processing'));
 
-        if (!response.ok) throw new Error(t('errorDuringDownload'));
+  const eventSource = new EventSource(`${apiBaseUrl}/video?url=${encodeURIComponent(videoUrl)}&format_id=${format.format_id}`);
 
-        const blob = await response.blob();
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `${videoTitle.textContent}.mp4`;
-        link.click();
+  eventSource.onmessage = (event) => {
+    statusMessage.textContent = event.data; // Actualiza el estado en tiempo real
+  };
 
-        stopProcessing(t('downloadCompleted'));
-        resetForm();
-      } catch (error) {
-        stopProcessing(error.message);
-      }
-    } else {
-      // Descarga directa (sin conversión)
-      startProcessing(t('startingQuickDownload'));
-      try {
-        const response = await fetch(`${apiBaseUrl}/direct`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ direct_url: format.url }),
-        });
+  eventSource.addEventListener('done', (event) => {
+    const fileUrl = `${apiBaseUrl}/downloads/${event.data}`;
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.download = 'video_con_audio.mp4';
+    link.click();
 
-        if (!response.ok) throw new Error(t('errorDuringDownload'));
+    stopProcessing(t('downloadCompleted'));
+    eventSource.close();
+    resetForm();
+  });
 
-        const blob = await response.blob();
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `${videoTitle.textContent}.mp4`;
-        link.click();
-
-        stopProcessing(t('downloadCompleted'));
-        resetForm();
-      } catch (error) {
-        stopProcessing(error.message);
-      }
-    }
-  } else if (type === 'audio') {
-    // Descarga de solo audio
-    startProcessing(t('startingAudioExtraction'));
-    try {
-      const response = await fetch(`${apiBaseUrl}/audio`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: videoUrl }),
-      });
-
-      if (!response.ok) throw new Error(t('errorDuringDownload'));
-
-      const blob = await response.blob();
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `${videoTitle.textContent || 'audio'}.mp3`;
-      link.click();
-
-      stopProcessing(t('downloadCompleted'));
-      resetForm();
-    } catch (error) {
-      stopProcessing(error.message);
-    }
-  }
+  eventSource.onerror = () => {
+    stopProcessing(t('errorDuringDownload'));
+    eventSource.close();
+  };
 });
