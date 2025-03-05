@@ -1,38 +1,35 @@
-# Usa Node.js 20 con soporte Debian
-FROM node:20-bullseye
+# Usa una imagen base de Node.js con soporte de Debian
+FROM node:18-bullseye
 
-# Establecer una variable de entorno para evitar avisos interactivos en Debian
-ENV DEBIAN_FRONTEND=noninteractive
+# Instala FFmpeg
+RUN apt-get update && apt-get install -y ffmpeg
 
-# Actualiza el sistema y instala FFmpeg y curl
-RUN apt-get update && apt-get install -y ffmpeg curl && rm -rf /var/lib/apt/lists/*
-
-# Crea un usuario sin privilegios para mayor seguridad
-RUN useradd -m appuser
-USER appuser
+# Instala yt-dlp (si es necesario)
+RUN apt-get install -y python3-pip && pip3 install --upgrade yt-dlp
 
 # Crea un directorio de trabajo
 WORKDIR /app
 
-# Copia solo los archivos esenciales para aprovechar la caché
-COPY --chown=appuser:appuser package*.json ./
+# Copia solo los archivos esenciales para instalar dependencias primero (para aprovechar la cache)
+COPY package*.json ./
 
-# Instala las dependencias del proyecto, ignorando scripts para evitar errores en `postinstall.js`
-RUN npm ci --only=production --ignore-scripts
+# Instala las dependencias del proyecto
+RUN npm install
 
 # Copia todos los archivos del proyecto al contenedor
-COPY --chown=appuser:appuser . .
+COPY . .
 
-# Ejecuta manualmente el script `postinstall.js` si es necesario
-RUN node node_modules/youtube-dl-exec/scripts/postinstall.js || true
+# Crea el directorio de descargas y establece permisos
+RUN mkdir -p /app/downloads && chmod -R 777 /app/downloads
 
-# Crea el directorio de descargas con los permisos correctos
-RUN mkdir -p /app/downloads
+# Asegúrate de que los directorios de idiomas están en la carpeta `public`
+# Ejemplo: public/en, public/es, public/chino
+# Si ya están organizados en el proyecto local, no es necesario copiarlos manualmente
 
-# Establece la variable de entorno para producción
+# Establece la variable de entorno para evitar problemas con el host
 ENV NODE_ENV=production
 
-# Expone el puerto de la aplicación
+# Expone el puerto (Render usará esta configuración)
 EXPOSE 3000
 
 # Comando para iniciar la aplicación
