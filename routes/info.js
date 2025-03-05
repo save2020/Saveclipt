@@ -24,8 +24,8 @@ function getRandomUserAgent() {
 // Función para seleccionar un proxy disponible
 function getRandomProxy(usedProxies) {
     const availableProxies = proxies.filter((proxy) => !usedProxies.includes(proxy.ip));
-
     if (availableProxies.length === 0) return null; // No hay más proxies disponibles
+
     const randomIndex = Math.floor(Math.random() * availableProxies.length);
     const proxy = availableProxies[randomIndex];
 
@@ -40,30 +40,17 @@ function delay(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// Objeto para rastrear el progreso por solicitud
-const progressTracker = {};
-
-// Endpoint para rastrear el progreso de información
-router.get('/progress/:id', (req, res) => {
-    const { id } = req.params;
-    const progress = progressTracker[id] || 0;
-    res.json({ progress });
-});
-
-// Endpoint para obtener información del video con rotación de proxies
+// Endpoint para obtener información del video con solo formatos sin conversión
 router.post('/info', async (req, res) => {
     const { url } = req.body;
-    const requestId = `${Date.now()}-${Math.random()}`; // Generar un ID único para esta solicitud
-    progressTracker[requestId] = 0; // Inicializar progreso
-
     if (!url) {
         return res.status(400).json({ error: 'La URL es requerida.' });
     }
 
-    const maxRetries = proxies.length; // Número máximo de intentos igual al número de proxies
-    const retryDelay = 3000; // Retraso de 3 segundos entre intentos
+    const maxRetries = proxies.length;
+    const retryDelay = 3000;
     let attempt = 0;
-    const usedProxies = []; // Lista de proxies ya utilizados
+    const usedProxies = [];
 
     while (attempt < maxRetries) {
         const proxy = getRandomProxy(usedProxies);
@@ -72,32 +59,19 @@ router.post('/info', async (req, res) => {
             break;
         }
 
-        // Agregar proxy a la lista de usados
         const proxyIP = proxy.split('@')[1]?.split(':')[0] || proxy.split(':')[0];
         usedProxies.push(proxyIP);
 
         console.log(`Usando proxy: ${proxy} (Intento ${attempt + 1}/${maxRetries})`);
 
         try {
-            // Simular progreso mientras se procesa la información
-            const interval = setInterval(() => {
-                if (progressTracker[requestId] < 100) {
-                    progressTracker[requestId] += 20; // Incrementar el progreso
-                }
-            }, 500);
-
-            // Obtener información del video
             const info = await youtubedl(url, {
                 dumpSingleJson: true,
                 proxy: `http://${proxy}`,
                 cookies: cookiesPath,
-                userAgent: getRandomUserAgent(), // User-Agent aleatorio
+                userAgent: getRandomUserAgent(),
             });
 
-            clearInterval(interval); // Detener el incremento del progreso
-            progressTracker[requestId] = 100; // Marcar progreso como completo
-
-            // Filtrar formatos deseados
             const desiredQualities = [360, 720, 1080];
             const formats = info.formats
                 .filter((f) => f.ext === 'mp4' && desiredQualities.includes(f.height))
@@ -110,7 +84,7 @@ router.post('/info', async (req, res) => {
                     filesize: f.filesize ? `${(f.filesize / (1024 * 1024)).toFixed(2)} MB` : 'Desconocido',
                 }));
 
-            // Agrupar formatos que no requieren combinación
+            // Filtrar formatos que NO requieren conversión
             const groupNoMerge = [];
             const seenNoMerge = new Set();
 
@@ -121,59 +95,28 @@ router.post('/info', async (req, res) => {
                 }
             });
 
-            // Duración del video
-            const videoDuration = info.duration; // Duración en segundos
-            const durationInMinutes = Math.floor(videoDuration / 60);
-
-            if (durationInMinutes > 50) {
-                if (groupNoMerge.length === 0) {
-                    delete progressTracker[requestId]; // Limpiar progreso
-                    return res.status(400).json({
-                        error: 'No hay formatos disponibles con audio y video para este video.',
-                    });
-                }
-                delete progressTracker[requestId]; // Limpiar progreso
-                return res.json({
-                    title: info.title,
-                    thumbnail: info.thumbnail,
-                    duration: durationInMinutes,
-                    formats: groupNoMerge, // Solo formatos que no requieren conversión
-                    restriction: 'Solo puedes descargar videos mayores a 50 minutos sin conversión.',
-                });
+            // Si no hay formatos sin conversión, enviar error
+            if (groupNoMerge.length === 0) {
+                return res.status(400).json({ error: 'No hay formatos disponibles con audio y video.' });
             }
 
-            // Agrupar formatos que requieren combinación
-            const groupRequiresMerge = [];
-            const seenRequiresMerge = new Set();
-
-            formats.forEach((format) => {
-                if (format.requires_merge && !seenRequiresMerge.has(format.quality)) {
-                    seenRequiresMerge.add(format.quality);
-                    groupRequiresMerge.push(format);
-                }
-            });
-
-            // Enviar respuesta y detener el ciclo
-            delete progressTracker[requestId]; // Limpiar progreso
             return res.json({
                 title: info.title,
                 thumbnail: info.thumbnail,
-                duration: durationInMinutes,
+                duration: Math.floor(info.duration / 60),
                 formats: {
-                    no_merge: groupNoMerge, // Sin conversión, tiene audio y video
-                    requires_merge: groupRequiresMerge, // Requiere conversión
+                    no_merge: groupNoMerge,  // ✅ Mantenemos la estructura anterior
                 },
             });
+
         } catch (error) {
             console.error(`Error con el proxy ${proxy}:`, error.message);
             attempt++;
             console.log(`Esperando ${retryDelay / 1000} segundos antes del próximo intento...`);
-            await delay(retryDelay); // Agregar retraso antes de reintentar
+            await delay(retryDelay);
         }
     }
 
-    // Si todos los intentos fallan
-    delete progressTracker[requestId]; // Eliminar progreso
     res.status(500).json({ error: 'No se pudo obtener la información del video después de varios intentos.' });
 });
 

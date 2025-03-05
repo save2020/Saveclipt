@@ -6,8 +6,6 @@ const path = require('path');
 
 // Importar las rutas de la API
 const infoRoutes = require('./routes/info');
-const audioRoutes = require('./routes/audio');
-const videoRoutes = require('./routes/video');
 const directRoutes = require('./routes/direct');
 
 const app = express();
@@ -83,8 +81,6 @@ app.get('/chino/chinoter', (req, res) => {
 
 // Rutas de la API dinámicas según idioma
 app.use('/:lang/api', infoRoutes); // Información del video
-app.use('/:lang/api', audioRoutes); // Manejo de audio
-app.use('/:lang/api', videoRoutes); // Manejo de videos
 app.use('/:lang/api', directRoutes); // Manejo de direct
 
 // Iniciar el servidor
