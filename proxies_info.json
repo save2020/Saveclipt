@@ -1,143 +1,5 @@
 [
     {
-        "ip": "92.113.139.27",
-        "port": "5979",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "23.27.236.125",
-        "port": "6861",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "93.113.150.41",
-        "port": "6452",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "64.137.8.113",
-        "port": "6795",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "45.39.5.59",
-        "port": "6497",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "103.114.59.26",
-        "port": "6803",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "2.57.31.90",
-        "port": "6666",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "31.59.10.75",
-        "port": "5646",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "104.252.41.244",
-        "port": "7181",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "104.239.38.146",
-        "port": "6679",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "93.113.150.160",
-        "port": "6571",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "50.114.98.69",
-        "port": "5553",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "92.112.155.156",
-        "port": "7280",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "92.249.34.155",
-        "port": "5837",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "192.95.91.149",
-        "port": "5776",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "31.57.83.80",
-        "port": "5654",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "31.58.18.137",
-        "port": "6406",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "2.57.20.16",
-        "port": "6008",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "81.21.234.34",
-        "port": "6423",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "31.59.33.39",
-        "port": "6615",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "91.123.9.75",
-        "port": "6617",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "168.199.227.176",
-        "port": "6955",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
-        "ip": "104.239.73.190",
-        "port": "6733",
-        "username": "itxuvpst",
-        "password": "9i07wb38qghj"
-    },
-    {
         "ip": "142.111.124.166",
         "port": "6186",
         "username": "itxuvpst",
@@ -170,6 +32,72 @@
     {
         "ip": "104.253.93.30",
         "port": "5456",
+        "username": "itxuvpst",
+        "password": "9i07wb38qghj"
+    },
+    {
+        "ip": "181.214.13.99",
+        "port": "5940",
+        "username": "itxuvpst",
+        "password": "9i07wb38qghj"
+    },
+    {
+        "ip": "142.111.161.114",
+        "port": "6485",
+        "username": "itxuvpst",
+        "password": "9i07wb38qghj"
+    },
+    {
+        "ip": "191.101.181.179",
+        "port": "6932",
+        "username": "itxuvpst",
+        "password": "9i07wb38qghj"
+    },
+    {
+        "ip": "193.187.114.98",
+        "port": "6113",
+        "username": "itxuvpst",
+        "password": "9i07wb38qghj"
+    },
+    {
+        "ip": "172.98.169.9",
+        "port": "6433",
+        "username": "itxuvpst",
+        "password": "9i07wb38qghj"
+    },
+    {
+        "ip": "64.137.121.211",
+        "port": "6466",
+        "username": "itxuvpst",
+        "password": "9i07wb38qghj"
+    },
+    {
+        "ip": "168.199.235.25",
+        "port": "6578",
+        "username": "itxuvpst",
+        "password": "9i07wb38qghj"
+    },
+    {
+        "ip": "91.123.11.87",
+        "port": "6353",
+        "username": "itxuvpst",
+        "password": "9i07wb38qghj"
+    },
+    {
+        "ip": "185.226.206.66",
+        "port": "6035",
+        "username": "itxuvpst",
+        "password": "9i07wb38qghj"
+    },
+    {
+        "ip": "192.154.250.84",
+        "port": "5664",
+        "username": "itxuvpst",
+        "password": "9i07wb38qghj"
+    },
+    {
+        "ip": "23.26.68.15",
+        "port": "5998",
         "username": "itxuvpst",
         "password": "9i07wb38qghj"
     }
