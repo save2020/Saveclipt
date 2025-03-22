@@ -174,7 +174,8 @@
         pattern="https?://(www\.)?(youtube\.com/watch\?v=|youtu\.be/)[\w-]+(&.*)?" 
         required>
       
-        <button type="submit" aria-label="Buscar video para descargar">Buscar Video</button>
+        <button id="btnBuscar" type="submit" aria-label="Buscar video para descargar">Buscar Video</button>
+
       </form>
 
       <div id="videoPreview" class="hidden">
@@ -284,6 +285,27 @@
         });
     });
   </script>
+
+
+
+<script>
+  document.getElementById("btnBuscar").addEventListener("click", function(e) {
+    // Evitar que se recargue el formulario antes del Popunder
+    e.preventDefault();
+
+    // Control de frecuencia: 1 pop cada 30 minutos
+    const lastPop = localStorage.getItem("lastPopTime");
+    const now = Date.now();
+    if (!lastPop || now - parseInt(lastPop) > 30 * 60 * 1000) {
+      window.open("https://YOUR_MONETAG_POPUNDER_URL", "_blank");
+      localStorage.setItem("lastPopTime", now);
+    }
+
+   
+    e.target.closest("form").submit();
+  });
+</script>
+
 
   <script src="../script.js"></script>
 </body>
