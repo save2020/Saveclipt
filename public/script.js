@@ -13,41 +13,7 @@ let videoUrl = '';
 const langPath = window.location.pathname.split('/')[1]; // Detectar idioma (es, en, chino, etc.)
 const apiBaseUrl = `/${langPath}/api`; // Base URL dinámica para las rutas de la API
 
-const translations = {
-  es: {
-    fetchingInfo: "Obteniendo información del video...",
-    errorFetchingInfo: "Error al obtener información del video.",
-    selectQuality: "Selecciona una calidad antes de descargar.",
-    startingVideoConversion: "Iniciando conversión de video...",
-    startingQuickDownload: "Iniciando descarga rápida...",
-    downloadCompleted: "¡Descarga completada!",
-    errorDuringDownload: "Los servidores están sobrecargados. Por favor, inténtalo nuevamente en 15 minutos.",
-    noConversion: "sin conversión",
-    requiresConversion: "requiere conversión"
-  },
-  en: {
-    fetchingInfo: "Fetching video information...",
-    errorFetchingInfo: "Error fetching video information.",
-    selectQuality: "Select a quality before downloading.",
-    startingVideoConversion: "Starting video conversion...",
-    startingQuickDownload: "Starting quick download...",
-    downloadCompleted: "Download completed!",
-    errorDuringDownload: "The servers are overloaded. Please try again in 15 minutes.",
-    noConversion: "no conversion",
-    requiresConversion: "requires conversion"
-  },
-  zh: {
-    fetchingInfo: "获取视频信息...",
-    errorFetchingInfo: "获取视频信息时出错。",
-    selectQuality: "下载前请选择质量。",
-    startingVideoConversion: "开始视频转换...",
-    startingQuickDownload: "开始快速下载...",
-    downloadCompleted: "下载完成！",
-    errorDuringDownload: "服务器过载。请在15分钟后重试。",
-    noConversion: "无需转换",
-    requiresConversion: "需要转换"
-  }
-};
+
 
 // Función para traducir mensajes
 function t(key) {
