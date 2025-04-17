@@ -21,14 +21,12 @@ app.use((req, res, next) => {
   const acceptLanguage = req.headers['accept-language'] || '';
   const primaryLanguage = acceptLanguage.split(',')[0].split('-')[0];
 
-  if (!req.url.startsWith('/en') && !req.url.startsWith('/es') && !req.url.startsWith('/chino')) {
+  if (!req.url.startsWith('/en') && !req.url.startsWith('/es')) {
     switch (primaryLanguage) {
       case 'en':
         return res.redirect(`/en${req.url}`);
       case 'es':
         return res.redirect(`/es${req.url}`);
-      case 'zh':
-        return res.redirect(`/chino${req.url}`);
       default:
         return res.redirect(`/en${req.url}`); // Idioma predeterminado: inglés
     }
@@ -39,7 +37,6 @@ app.use((req, res, next) => {
 // Rutas estáticas para los idiomas
 app.use('/en', express.static(path.join(__dirname, 'public/en')));
 app.use('/es', express.static(path.join(__dirname, 'public/es')));
-app.use('/chino', express.static(path.join(__dirname, 'public/chino')));
 
 // Rutas amigables para las páginas principales
 app.get('/es', (req, res) => {
@@ -48,10 +45,6 @@ app.get('/es', (req, res) => {
 
 app.get('/en', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/en/enindex.html'));
-});
-
-app.get('/chino', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/chino/chinoindex.html'));
 });
 
 // Rutas amigables para políticas y términos
@@ -69,14 +62,6 @@ app.get('/en/privacy-policy', (req, res) => {
 
 app.get('/en/terms-and-conditions', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/en/enterms-and-conditions.html'));
-});
-
-app.get('/chino/chinopriva', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/chino/chinopriva.html'));
-});
-
-app.get('/chino/chinoter', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/chino/chinoter.html'));
 });
 
 // Rutas de la API dinámicas según idioma
